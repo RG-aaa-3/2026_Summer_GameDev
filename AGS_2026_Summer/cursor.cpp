@@ -30,6 +30,8 @@ void cursor::GameInit(void) {
 
 void cursor::Update(void) {
 
+	Cursormove();
+
 }
 
 void cursor::Draw(void) {
@@ -48,13 +50,13 @@ bool cursor::Release(void) {
 void cursor::Cursormove(void) {
 	//à⁄ìÆ(è„â∫ç∂âEÉLÅ[)
 	if (CheckHitKey(KEY_INPUT_LEFT)) {
-		pos.x += CURSOR_MOVE_SPEED_X;
-	}
-	if (CheckHitKey(KEY_INPUT_RIGHT)) {
 		pos.x -= CURSOR_MOVE_SPEED_X;
 	}
+	if (CheckHitKey(KEY_INPUT_RIGHT)) {
+		pos.x += CURSOR_MOVE_SPEED_X;
+	}
 	if (CheckHitKey(KEY_INPUT_UP)) {
-		pos.y += CURSOR_MOVE_SPEED_Y;
+		pos.y -= CURSOR_MOVE_SPEED_Y;
 	}
 	if (CheckHitKey(KEY_INPUT_DOWN)) {
 		pos.y += CURSOR_MOVE_SPEED_Y;

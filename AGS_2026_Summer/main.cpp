@@ -1,6 +1,6 @@
 #include <DxLib.h>
 #include "SceneManager.h"
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 	//シーンマネージャーのオブジェクトを作成
 	SceneManager sceneMana;
 
