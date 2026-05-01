@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\wonki\\Documents\\2026_Summer_GameDev\\AGS_2026_Summer\\",
+  "WorkspaceRootPath": "C:\\AGS2026_summer\\AGS_2026_Summer\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\Users\\wonki\\Documents\\2026_Summer_GameDev\\AGS_2026_Summer\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -20,9 +20,9 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\wonki\\Documents\\2026_Summer_GameDev\\AGS_2026_Summer\\main.cpp",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "C:\\Users\\wonki\\Documents\\2026_Summer_GameDev\\AGS_2026_Summer\\main.cpp",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\main.cpp",
               "RelativeToolTip": "main.cpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
