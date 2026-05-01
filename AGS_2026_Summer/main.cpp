@@ -1,18 +1,18 @@
 #include <DxLib.h>
-
+#include "SceneManager.h"
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	//シーンマネージャーのオブジェクトを作成
+	SceneManager sceneMana;
 
-	if (DxLib_Init() == -1) {
-		return -1;
-
-	}
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0) {
-
-
-
+	//初期化処理
+	sceneMana.SystemInit();
+	//ゲーム起動
+	sceneMana.Run();
+	//開放処理
+	sceneMana.Release();
 
 
-	}
+
 
 
 
