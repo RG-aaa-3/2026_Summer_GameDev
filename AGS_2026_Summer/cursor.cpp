@@ -82,3 +82,13 @@ void cursor::Cursormove(void) {
 
 
 }
+
+
+void GetClicked(void) {
+	if (CheckHitKey(KEY_INPUT_SPACE)) {
+
+
+
+
+	}
+}

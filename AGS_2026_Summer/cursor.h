@@ -23,7 +23,7 @@ class cursor
 	bool Release(void);				//‰ğ•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚İÀs)
 
 	void Cursormove(void);
-	
+	void GetCricked(void);
 
 
 	Vector2 GetPlayerPos(void) { return pos; }
