@@ -22,7 +22,7 @@ class GameScene
 	void Draw(void);				//•`‰æˆ—
 	bool Release(void);				//‰ğ•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚İÀs)
 
-
+	void CollisionCheck(void);
 
 
 private:

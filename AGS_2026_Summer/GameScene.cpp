@@ -1,7 +1,8 @@
 #include "GameScene.h"
 #include <DxLib.h>
 #include "cursor.h"
-
+#include "Vector2F.h"
+#include "PeaceBase.h"
 
 GameScene::GameScene(void) {
 	Cursor = nullptr;
@@ -49,3 +50,16 @@ bool GameScene::Release(void) {
 
 	return true;
 }
+
+
+void GameScene::CollisionCheck(void) {
+	//カーソルの位置
+	Vector2F pos = Cursor->GetCursorPos();
+	Vector2 cPos = AsoUtility::Round(pos);
+	Vector2 cSize = { cursor::CURSOR_IMG_WID,cursor::CURSOR_IMG_HIG };
+
+	//ピースの数だけチェック
+
+
+}
+

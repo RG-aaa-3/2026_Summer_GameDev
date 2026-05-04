@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+#include "Vector2F.h"
 class cursor
 {public:
 
@@ -26,12 +27,12 @@ class cursor
 	void GetCricked(void);
 
 
-	Vector2 GetPlayerPos(void) { return pos; }
+	Vector2F GetCursorPos(void) { return pos; }
 
 
 private:
 	int img;
-	Vector2 pos;
+	Vector2F pos;
 	bool holdflg;		//ƒs[ƒX‚ğ‚Â‚©‚ñ‚Å‚¢‚é‚©(true=‚Â‚©‚ñ‚Å‚¢‚é)
 
 };
