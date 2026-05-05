@@ -4,9 +4,11 @@
 
 void PeaceO::SetPeacePram(void) {
 	//画像ファイル名
-	imgFName = "";
+	imgFName = "PeaceO.png";
 	//画像サイズ
-	size = { 00,00 };
+	size = { 500,500 };
 	
+	//拡大・縮小量
+	wide = 10;
 
 }

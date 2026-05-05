@@ -25,7 +25,7 @@ void cursor::GameInit(void) {
 
 
 
-	holdflg = false;
+	canhold= false;
 }
 
 void cursor::Update(void) {
@@ -84,11 +84,22 @@ void cursor::Cursormove(void) {
 }
 
 
-void GetClicked(void) {
-	if (CheckHitKey(KEY_INPUT_SPACE)) {
+void cursor::GetClicked(void) {
+	if (CheckHitKey(KEY_INPUT_SPACE)&&canhold) {
+	
+		
 
 
 
+	}
+}
 
+void cursor::CanHold(int c) {
+	
+	if (c == 1) {
+		canhold = true;
+	}
+	if (c == 2) {
+		canhold = false;
 	}
 }

@@ -1,9 +1,9 @@
 #pragma once
 #include "Vector2.h"
-
+#include <vector>
 
 class cursor;
-
+class PeaceBase;
 
 
 class GameScene
@@ -23,10 +23,13 @@ class GameScene
 	bool Release(void);				//‰ğ•úˆ—(ÅŒã‚Ì‚P‰ñ‚Ì‚İÀs)
 
 	void CollisionCheck(void);
-
+	
 
 private:
 	cursor* Cursor;
+	std::vector<PeaceBase*> peace;
+
+	bool CollisionCheckRectCenter(Vector2 cPos1, Vector2 size1, Vector2 cPos2, Vector2 size2);
 
 
 };

@@ -25,6 +25,9 @@ public:
 		PEACE_MAX,
 	};
 
+
+
+
 	~PeaceBase();
 	PeaceBase();
 
@@ -69,6 +72,9 @@ protected:
 
 	//‰æ‘œƒTƒCƒY
 	Vector2 size;
+
+	//Šg‘å/k¬—Ê
+	int wide;
 
 	//‰æ‘œ‚ÌŒü‚«İ’è
 	void SetPeaceDirection(Vector2 pdir);

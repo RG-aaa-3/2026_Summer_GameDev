@@ -42,12 +42,15 @@ void PeaceBase::Update(void) {
 
 void PeaceBase::Draw(void) {
 
+	Vector2 pPos;
+	DrawExtendGraph(pPos.x - size.x / 2, pPos.y - size.y / 2,
+		size.x / wide, size.y / wide, peace_img[peaceDir], true);
 
 }
 
 bool PeaceBase::Release(void) {
 
-
+	return true;
 }
 
 

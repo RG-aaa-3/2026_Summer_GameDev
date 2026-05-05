@@ -24,8 +24,9 @@ class cursor
 	bool Release(void);				//解放処理(最後の１回のみ実行)
 
 	void Cursormove(void);
-	void GetCricked(void);
+	void GetClicked(void);
 
+	void CanHold(int c);		//掴めるか状態変更  1=true  2=false
 
 	Vector2F GetCursorPos(void) { return pos; }
 
@@ -33,7 +34,7 @@ class cursor
 private:
 	int img;
 	Vector2F pos;
-	bool holdflg;		//ピースをつかんでいるか(true=つかんでいる)
+	bool canhold;	//掴める状態か
 
 };
 
