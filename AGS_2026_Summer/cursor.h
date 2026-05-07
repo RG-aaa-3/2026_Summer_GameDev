@@ -29,12 +29,12 @@ class cursor
 	void CanHold(int c);		//’Í‚ß‚é‚©ó‘Ô•ÏX  1=true  2=false
 
 	Vector2F GetCursorPos(void) { return pos; }
+	bool canhold;	//’Í‚ß‚éó‘Ô‚©
 
 
 private:
 	int img;
 	Vector2F pos;
-	bool canhold;	//’Í‚ß‚éó‘Ô‚©
 
 };
 

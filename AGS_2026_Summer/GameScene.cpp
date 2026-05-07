@@ -31,18 +31,21 @@ void GameScene::GameInit(void) {
 }
 
 void GameScene::Update(void) {
+	Cursor->Update();
 
+	Vector2F cursorPos = Cursor->GetCursorPos();
+	bool holdButton = CheckHitKey(KEY_INPUT_SPACE);
+	bool rotateButton = CheckHitKey(KEY_INPUT_B);
 
-	size_t size = peace.size();
-	std::vector<PeaceBase*>::iterator eitr = peace.begin();
-	for (int ii = 0; ii < size; ii++) {
-		(*eitr)->Update();
-		eitr++;
+	for (int i = 0; i < peace.size(); i++) {
+		peace[i]->Update(cursorPos, holdButton, rotateButton);
 	}
+
+
 	CollisionCheck();
 
 
-	Cursor->Update();
+
 
 
 }
