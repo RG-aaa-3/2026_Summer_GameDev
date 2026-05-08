@@ -3,6 +3,7 @@
 #include "cursor.h"
 #include "Vector2F.h"
 #include "PeaceBase.h"
+#include "PeaceO.h"
 
 GameScene::GameScene(void) {
 	Cursor = nullptr;
@@ -16,12 +17,32 @@ GameScene::~GameScene(void) {
 
 
 bool GameScene::SystemInit(void) {
-	//ポインタの初期化&チェック
+	// カーソル生成
 	Cursor = new cursor();
-	if (Cursor == nullptr)return false;
-	if (Cursor->SystemInit() == false)return false;
+	if (Cursor == nullptr) return false;
+	if (Cursor->SystemInit() == false) return false;
 
+	// O型ピースの形
+	std::vector<std::vector<int>> shapeO = {
+		{1, 1},
+		{1, 1}
+	};
 
+	// ピース生成
+	PeaceBase* p = new PeaceO(
+		0,
+		shapeO,
+		200,	// 表示X座標
+		150,	// 表示Y座標
+		50		// 1マスのサイズ
+	);
+
+	if (p == nullptr) return false;
+	if (p->SystemInit(this) == false) return false;
+
+	peace.push_back(p);
+
+	return true;
 }
 //以下各要素呼び出し
 void GameScene::GameInit(void) {
@@ -31,39 +52,25 @@ void GameScene::GameInit(void) {
 }
 
 void GameScene::Update(void) {
+
 	Cursor->Update();
 
-	Vector2F cursorPos = Cursor->GetCursorPos();
-	bool holdButton = CheckHitKey(KEY_INPUT_SPACE);
-	bool rotateButton = CheckHitKey(KEY_INPUT_B);
-
 	for (int i = 0; i < peace.size(); i++) {
-		peace[i]->Update(cursorPos, holdButton, rotateButton);
+		peace[i]->Update(
+			Cursor->GetPos(),
+			CheckHitKey(KEY_INPUT_SPACE),
+			CheckHitKey(KEY_INPUT_Z)
+		);
 	}
-
-
-	CollisionCheck();
-
-
-
-
-
 }
 
 void GameScene::Draw(void) {
-	Cursor->Draw();
 
-	size_t size = peace.size();
-	std::vector<PeaceBase*>::iterator eitr = peace.begin();
-	for (int ii = 0; ii < size; ii++) {
-		(*eitr)->Draw();
-		eitr++;
-
+	for (int i = 0; i < peace.size(); i++) {
+		peace[i]->Draw();
 	}
 
-
-
-
+	Cursor->Draw();
 }
 
 bool GameScene::Release(void) {

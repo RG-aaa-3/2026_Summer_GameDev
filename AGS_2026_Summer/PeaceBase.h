@@ -4,7 +4,7 @@
 #include "AsoUtility.h"
 #include "Vector2F.h"
 #include "cursor.h"
-
+#include <vector>
 
 class GameScene;
 class cursor;
@@ -53,7 +53,7 @@ public:
 	//画像サイズ取得
 	virtual  Vector2 GetPeaceSize(void) { return size; }
 	//掴めているか判定
-	virtual bool GetHold(void) { return HoldFlg; }
+	virtual bool GetHold(void) { return isHolding; }
 
 
 
@@ -88,8 +88,8 @@ protected:
 	//ピースの向き
 	int peaceDir;
 	//ホールドフラグ
-	bool HoldFlg = false;
-
+	bool isHolding = false;
+	Vector2F holdOffset;
 
 	//画像ファイル名
 	std::string imgFName;

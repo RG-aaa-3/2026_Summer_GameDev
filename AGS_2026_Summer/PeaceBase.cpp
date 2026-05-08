@@ -9,62 +9,107 @@ PeaceBase::~PeaceBase() {
 
 }
 
-PeaceBase::PeaceBase(int graphHandle,
+PeaceBase::PeaceBase(
+	int graphHandle,
 	const std::vector<std::vector<int>>& shape,
 	int startX,
 	int startY,
-	int cellSize)
+	int cellSize
+)
 {
-	this->graphHandle;
+	this->graphHandle = graphHandle;
 	this->shape = shape;
 
 	this->x = startX;
 	this->y = startY;
 	this->cellSize = cellSize;
-	
 
+	this->peacePos = Vector2F((float)startX, (float)startY);
+
+	this->peaceDir = 0;
+	this->wide = 1;
+
+	for (int i = 0; i < static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX); i++) {
+		peace_img[i] = -1;
+	}
 }
 
 
 bool PeaceBase::SystemInit(GameScene* gs) {
 
 	gInst = gs;
-	//敵キャラ個別のパラメータ設定処理
+
 	SetPeacePram();
 
 	std::string path = "image/";
 	path += imgFName;
-	int err = LoadGraph(path.c_str());
 
-	if (err == -1)return false;
+	peace_img[0] = LoadGraph(path.c_str());
+
+	if (peace_img[0] == -1) return false;
+
+	peaceDir = 0;
 
 	return true;
 }
-
 
  void PeaceBase::GameInit(void) {
 
 
 }
 
-void PeaceBase::Update(const Vector2F& cursorPos, bool holdButton, bool rotateButton) {
-	if (c->canhold) {
-		peacePos.x = cursorPos.x - dragOffset.x;
-		peacePos.y = cursorPos.y - dragOffset.y;
+ void PeaceBase::Update(const Vector2F& cursorPos, bool holdButton, bool rotateButton) {
 
-	}
+	 bool triggerHold = holdButton && !prevHoldButton;
 
+	 // 掴み始め
+	 if (triggerHold && !isHolding) {
 
-	prevHoldButton = holdButton;
-	prevRotateButton = rotateButton;
-}
+		 int drawW = size.x / wide;
+		 int drawH = size.y / wide;
+
+		 bool isCursorOnPiece =
+			 cursorPos.x >= peacePos.x &&
+			 cursorPos.x <= peacePos.x + drawW &&
+			 cursorPos.y >= peacePos.y &&
+			 cursorPos.y <= peacePos.y + drawH;
+
+		 if (isCursorOnPiece) {
+			 isHolding = true;
+
+			 holdOffset.x = cursorPos.x - peacePos.x;
+			 holdOffset.y = cursorPos.y - peacePos.y;
+		 }
+	 }
+
+	 // 掴んでいる間
+	 if (isHolding) {
+		 peacePos.x = cursorPos.x - holdOffset.x;
+		 peacePos.y = cursorPos.y - holdOffset.y;
+	 }
+
+	 // 離したら解除
+	 if (!holdButton) {
+		 isHolding = false;
+	 }
+
+	 prevHoldButton = holdButton;
+	 prevRotateButton = rotateButton;
+ }
 
 void PeaceBase::Draw(void) {
 
-	Vector2 pPos;
-	DrawExtendGraph(pPos.x - size.x / 2, pPos.y - size.y / 2,
-		size.x / wide, size.y / wide, peace_img[peaceDir], true);
+	int drawW = size.x / wide;
+	int drawH = size.y / wide;
 
+	DrawExtendGraph(
+		(int)peacePos.x,
+		(int)peacePos.y,
+		(int)peacePos.x + drawW,
+		(int)peacePos.y + drawH,
+		peace_img[peaceDir],
+		true
+	);
 }
 
 bool PeaceBase::Release(void) {

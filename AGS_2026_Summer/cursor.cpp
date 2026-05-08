@@ -103,3 +103,8 @@ void cursor::CanHold(int c) {
 		canhold = false;
 	}
 }
+
+
+Vector2F cursor::GetPos(void) const {
+	return pos;
+}
