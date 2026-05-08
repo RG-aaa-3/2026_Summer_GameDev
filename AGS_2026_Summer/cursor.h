@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+#include "Vector2F.h"
 class cursor
 {public:
 
@@ -23,16 +24,17 @@ class cursor
 	bool Release(void);				//解放処理(最後の１回のみ実行)
 
 	void Cursormove(void);
+	void GetClicked(void);
 
+	void CanHold(int c);		//掴めるか状態変更  1=true  2=false
 
-
-	Vector2 GetPlayerPos(void) { return pos; }
+	Vector2F GetCursorPos(void) { return pos; }
+	bool canhold;	//掴める状態か
 
 
 private:
 	int img;
-	Vector2 pos;
-	bool holdflg;		//ピースをつかんでいるか(true=つかんでいる)
+	Vector2F pos;
 
 };
 

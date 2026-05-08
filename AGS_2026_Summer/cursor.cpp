@@ -25,10 +25,12 @@ void cursor::GameInit(void) {
 
 
 
-	holdflg = false;
+	canhold= false;
 }
 
 void cursor::Update(void) {
+
+	Cursormove();
 
 }
 
@@ -48,13 +50,13 @@ bool cursor::Release(void) {
 void cursor::Cursormove(void) {
 	//à⁄ìÆ(è„â∫ç∂âEÉLÅ[)
 	if (CheckHitKey(KEY_INPUT_LEFT)) {
-		pos.x += CURSOR_MOVE_SPEED_X;
-	}
-	if (CheckHitKey(KEY_INPUT_RIGHT)) {
 		pos.x -= CURSOR_MOVE_SPEED_X;
 	}
+	if (CheckHitKey(KEY_INPUT_RIGHT)) {
+		pos.x += CURSOR_MOVE_SPEED_X;
+	}
 	if (CheckHitKey(KEY_INPUT_UP)) {
-		pos.y += CURSOR_MOVE_SPEED_Y;
+		pos.y -= CURSOR_MOVE_SPEED_Y;
 	}
 	if (CheckHitKey(KEY_INPUT_DOWN)) {
 		pos.y += CURSOR_MOVE_SPEED_Y;
@@ -79,4 +81,25 @@ void cursor::Cursormove(void) {
 
 
 
+}
+
+
+void cursor::GetClicked(void) {
+	if (CheckHitKey(KEY_INPUT_SPACE)&&canhold) {
+	
+		
+
+
+
+	}
+}
+
+void cursor::CanHold(int c) {
+	
+	if (c == 1) {
+		canhold = true;
+	}
+	if (c == 2) {
+		canhold = false;
+	}
 }
