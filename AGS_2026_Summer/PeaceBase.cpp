@@ -9,68 +9,169 @@ PeaceBase::~PeaceBase() {
 
 }
 
-PeaceBase::PeaceBase(int graphHandle,
+PeaceBase::PeaceBase(
+	int graphHandle,
 	const std::vector<std::vector<int>>& shape,
 	int startX,
 	int startY,
-	int cellSize)
+	int cellSize
+)
 {
-	this->graphHandle;
+	this->graphHandle = graphHandle;
 	this->shape = shape;
 
 	this->x = startX;
 	this->y = startY;
 	this->cellSize = cellSize;
-	
 
+	this->peacePos = Vector2F((float)startX, (float)startY);
+
+	this->peaceDir = 0;
+	this->wide = 1;
+
+	for (int i = 0; i < static_cast<int>(AsoUtility::DIRECTION::E_DIR_MAX); i++) {
+		peace_img[i] = -1;
+	}
 }
 
 
 bool PeaceBase::SystemInit(GameScene* gs) {
 
 	gInst = gs;
-	//敵キャラ個別のパラメータ設定処理
+
 	SetPeacePram();
 
 	std::string path = "image/";
 	path += imgFName;
-	int err = LoadGraph(path.c_str());
 
-	if (err == -1)return false;
+	peace_img[0] = LoadGraph(path.c_str());
+
+	if (peace_img[0] == -1) return false;
+
+	peaceDir = 0;
 
 	return true;
 }
-
 
  void PeaceBase::GameInit(void) {
 
 
 }
 
-void PeaceBase::Update(const Vector2F& cursorPos, bool holdButton, bool rotateButton) {
-	if (c->canhold) {
-		peacePos.x = cursorPos.x - dragOffset.x;
-		peacePos.y = cursorPos.y - dragOffset.y;
+ void PeaceBase::Update(
+	 const Vector2F& cursorPos,
+	 bool holdButton,
+	 bool rotateLeftButton,
+	 bool rotateRightButton
+ )
+ {
+	 releasedThisFrame = false;
 
-	}
+	 bool triggerHold = holdButton && !prevHoldButton;
+	 bool triggerRelease = !holdButton && prevHoldButton;
+
+	 bool triggerRotateLeft = rotateLeftButton && !prevRotateLeftButton;
+	 bool triggerRotateRight = rotateRightButton && !prevRotateRightButton;
+
+	 if (isPlaced)
+	 {
+		 prevHoldButton = holdButton;
+		 prevRotateLeftButton = rotateLeftButton;
+		 prevRotateRightButton = rotateRightButton;
+		 return;
+	 }
+
+	 // 掴み始め
+	 if (triggerHold && !isHolding)
+	 {
+		 if (IsCursorOnPiece(cursorPos))
+		 {
+			 isHolding = true;
+
+			 dragOffset.x = cursorPos.x - peacePos.x;
+			 dragOffset.y = cursorPos.y - peacePos.y;
+		 }
+	 }
+
+	 // 掴んでいる間
+	 if (isHolding)
+	 {
+		 peacePos.x = cursorPos.x - dragOffset.x;
+		 peacePos.y = cursorPos.y - dragOffset.y;
+
+		 // Vで左回転
+		 if (triggerRotateLeft)
+		 {
+			 peaceDir--;
+
+			 if (peaceDir < 0)
+			 {
+				 peaceDir = 3;
+			 }
+		 }
+
+		 // Nで右回転
+		 if (triggerRotateRight)
+		 {
+			 peaceDir++;
+
+			 if (peaceDir > 3)
+			 {
+				 peaceDir = 0;
+			 }
+		 }
+	 }
+
+	 // 離した瞬間
+	 if (triggerRelease && isHolding)
+	 {
+		 isHolding = false;
+		 releasedThisFrame = true;
+	 }
+
+	 prevHoldButton = holdButton;
+	 prevRotateLeftButton = rotateLeftButton;
+	 prevRotateRightButton = rotateRightButton;
+ }
 
 
-	prevHoldButton = holdButton;
-	prevRotateButton = rotateButton;
-}
+ void PeaceBase::Draw(void)
+ {
+	 Vector2 currentSize = GetCurrentPeaceSize();
 
-void PeaceBase::Draw(void) {
+	 float centerX = peacePos.x + currentSize.x / 2.0f;
+	 float centerY = peacePos.y + currentSize.y / 2.0f;
 
-	Vector2 pPos;
-	DrawExtendGraph(pPos.x - size.x / 2, pPos.y - size.y / 2,
-		size.x / wide, size.y / wide, peace_img[peaceDir], true);
+	 double angle = 0.0;
 
-}
+	 switch (peaceDir)
+	 {
+	 case 0:
+		 angle = 0.0;
+		 break;
 
-bool PeaceBase::Release(void) {
+	 case 1:
+		 angle = DX_PI / 2.0;
+		 break;
 
-	return true;
-}
+	 case 2:
+		 angle = DX_PI;
+		 break;
+
+	 case 3:
+		 angle = DX_PI * 3.0 / 2.0;
+		 break;
+	 }
+
+	 DrawRotaGraph(
+		 (int)centerX,
+		 (int)centerY,
+		 1.0 / wide,
+		 angle,
+		 peace_img[0],
+		 true
+	 );
+ }
 
 
 bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos) {
@@ -99,4 +200,35 @@ bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos) {
 
 
 
+}
+
+Vector2 PeaceBase::GetCurrentPeaceSize(void) const
+{
+	if (shape.empty())
+	{
+		return Vector2(0, 0);
+	}
+
+	int baseW = (int)shape[0].size() * cellSize;
+	int baseH = (int)shape.size() * cellSize;
+
+	// 0度・180度
+	if (peaceDir % 2 == 0)
+	{
+		return Vector2(baseW, baseH);
+	}
+
+	// 90度・270度は横幅と高さが入れ替わる
+	return Vector2(baseH, baseW);
+}
+
+
+Vector2F PeaceBase::GetCenterPos(void) const
+{
+	Vector2 size = GetCurrentPeaceSize();
+
+	return Vector2F(
+		peacePos.x + size.x / 2.0f,
+		peacePos.y + size.y / 2.0f
+	);
 }

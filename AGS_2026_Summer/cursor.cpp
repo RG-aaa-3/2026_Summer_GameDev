@@ -74,9 +74,9 @@ void cursor::Cursormove(void) {
 	if (pos.y < 0) {
 		pos.y = 0;
 	}
-	// 下端のチェック
-	if (pos.y > (SceneManager::SCREEN_SIZE_HIG - CURSOR_IMG_HIG)) {
-		pos.y = (SceneManager::SCREEN_SIZE_HIG - CURSOR_IMG_WID);
+	// 下端のチェック(下だけ画面下に行けるが行き過ぎないように)
+	if (pos.y > (SceneManager::SCREEN_SIZE_HIG + CURSOR_IMG_HIG)) {
+		pos.y = (SceneManager::SCREEN_SIZE_HIG + CURSOR_IMG_WID);
 	}
 
 
@@ -102,4 +102,9 @@ void cursor::CanHold(int c) {
 	if (c == 2) {
 		canhold = false;
 	}
+}
+
+
+Vector2F cursor::GetPos(void) const {
+	return pos;
 }

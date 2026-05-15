@@ -14,6 +14,7 @@ class cursor
 	static constexpr int CURSOR_MOVE_SPEED_X = 2;
 	static constexpr int CURSOR_MOVE_SPEED_Y = 2;
 
+	Vector2F GetPos(void) const;
 
 
 

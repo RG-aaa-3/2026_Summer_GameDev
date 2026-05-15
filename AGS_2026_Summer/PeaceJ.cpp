@@ -1,7 +1,7 @@
-#include "PeaceO.h"
+#include "PeaceJ.h"
 #include <DxLib.h>
 
-PeaceO::PeaceO(
+PeaceJ::PeaceJ(
 	int graphHandle,
 	const std::vector<std::vector<int>>& shape,
 	int startX,
@@ -12,9 +12,9 @@ PeaceO::PeaceO(
 {
 }
 
-void PeaceO::SetPeacePram(void) {
+void PeaceJ::SetPeacePram(void) {
 	// 画像ファイル名
-	imgFName = "PeaceO.png";
+	imgFName = "PeaceJ.png";
 
 	// 元画像サイズ
 	size = { 240, 320 };

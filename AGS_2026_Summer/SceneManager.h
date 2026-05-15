@@ -1,12 +1,11 @@
 #pragma once
 #include "GameScene.h"
-class GameScene;
 
 class SceneManager
 {public:
 
-	static constexpr int SCREEN_SIZE_WID = 640;
-	static constexpr int SCREEN_SIZE_HIG = 480;
+	static constexpr int SCREEN_SIZE_WID = 1920;
+	static constexpr int SCREEN_SIZE_HIG = 1080;
 
 
 	SceneManager(void);			//コンストラクタ

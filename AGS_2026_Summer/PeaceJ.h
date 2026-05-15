@@ -1,10 +1,10 @@
 #pragma once
 #include "PeaceBase.h"
 
-class PeaceO : public PeaceBase
+class PeaceJ : public PeaceBase
 {
 public:
-	PeaceO(
+	PeaceJ(
 		int graphHandle,
 		const std::vector<std::vector<int>>& shape,
 		int startX,
