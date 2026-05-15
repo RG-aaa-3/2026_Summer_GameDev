@@ -58,64 +58,120 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 
 }
 
- void PeaceBase::Update(const Vector2F& cursorPos, bool holdButton, bool rotateButton) {
+ void PeaceBase::Update(
+	 const Vector2F& cursorPos,
+	 bool holdButton,
+	 bool rotateLeftButton,
+	 bool rotateRightButton
+ )
+ {
+	 releasedThisFrame = false;
 
 	 bool triggerHold = holdButton && !prevHoldButton;
+	 bool triggerRelease = !holdButton && prevHoldButton;
+
+	 bool triggerRotateLeft = rotateLeftButton && !prevRotateLeftButton;
+	 bool triggerRotateRight = rotateRightButton && !prevRotateRightButton;
+
+	 if (isPlaced)
+	 {
+		 prevHoldButton = holdButton;
+		 prevRotateLeftButton = rotateLeftButton;
+		 prevRotateRightButton = rotateRightButton;
+		 return;
+	 }
 
 	 // 掴み始め
-	 if (triggerHold && !isHolding) {
-
-		 int drawW = size.x / wide;
-		 int drawH = size.y / wide;
-
-		 bool isCursorOnPiece =
-			 cursorPos.x >= peacePos.x &&
-			 cursorPos.x <= peacePos.x + drawW &&
-			 cursorPos.y >= peacePos.y &&
-			 cursorPos.y <= peacePos.y + drawH;
-
-		 if (isCursorOnPiece) {
+	 if (triggerHold && !isHolding)
+	 {
+		 if (IsCursorOnPiece(cursorPos))
+		 {
 			 isHolding = true;
 
-			 holdOffset.x = cursorPos.x - peacePos.x;
-			 holdOffset.y = cursorPos.y - peacePos.y;
+			 dragOffset.x = cursorPos.x - peacePos.x;
+			 dragOffset.y = cursorPos.y - peacePos.y;
 		 }
 	 }
 
 	 // 掴んでいる間
-	 if (isHolding) {
-		 peacePos.x = cursorPos.x - holdOffset.x;
-		 peacePos.y = cursorPos.y - holdOffset.y;
+	 if (isHolding)
+	 {
+		 peacePos.x = cursorPos.x - dragOffset.x;
+		 peacePos.y = cursorPos.y - dragOffset.y;
+
+		 // Vで左回転
+		 if (triggerRotateLeft)
+		 {
+			 peaceDir--;
+
+			 if (peaceDir < 0)
+			 {
+				 peaceDir = 3;
+			 }
+		 }
+
+		 // Nで右回転
+		 if (triggerRotateRight)
+		 {
+			 peaceDir++;
+
+			 if (peaceDir > 3)
+			 {
+				 peaceDir = 0;
+			 }
+		 }
 	 }
 
-	 // 離したら解除
-	 if (!holdButton) {
+	 // 離した瞬間
+	 if (triggerRelease && isHolding)
+	 {
 		 isHolding = false;
+		 releasedThisFrame = true;
 	 }
 
 	 prevHoldButton = holdButton;
-	 prevRotateButton = rotateButton;
+	 prevRotateLeftButton = rotateLeftButton;
+	 prevRotateRightButton = rotateRightButton;
  }
 
-void PeaceBase::Draw(void) {
 
-	int drawW = size.x / wide;
-	int drawH = size.y / wide;
+ void PeaceBase::Draw(void)
+ {
+	 Vector2 currentSize = GetCurrentPeaceSize();
 
-	DrawExtendGraph(
-		(int)peacePos.x,
-		(int)peacePos.y,
-		(int)peacePos.x + drawW,
-		(int)peacePos.y + drawH,
-		peace_img[peaceDir],
-		true
-	);
-}
+	 float centerX = peacePos.x + currentSize.x / 2.0f;
+	 float centerY = peacePos.y + currentSize.y / 2.0f;
 
-bool PeaceBase::Release(void) {
+	 double angle = 0.0;
 
-	return true;
-}
+	 switch (peaceDir)
+	 {
+	 case 0:
+		 angle = 0.0;
+		 break;
+
+	 case 1:
+		 angle = DX_PI / 2.0;
+		 break;
+
+	 case 2:
+		 angle = DX_PI;
+		 break;
+
+	 case 3:
+		 angle = DX_PI * 3.0 / 2.0;
+		 break;
+	 }
+
+	 DrawRotaGraph(
+		 (int)centerX,
+		 (int)centerY,
+		 1.0 / wide,
+		 angle,
+		 peace_img[0],
+		 true
+	 );
+ }
 
 
 bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos) {
@@ -144,4 +200,35 @@ bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos) {
 
 
 
+}
+
+Vector2 PeaceBase::GetCurrentPeaceSize(void) const
+{
+	if (shape.empty())
+	{
+		return Vector2(0, 0);
+	}
+
+	int baseW = (int)shape[0].size() * cellSize;
+	int baseH = (int)shape.size() * cellSize;
+
+	// 0度・180度
+	if (peaceDir % 2 == 0)
+	{
+		return Vector2(baseW, baseH);
+	}
+
+	// 90度・270度は横幅と高さが入れ替わる
+	return Vector2(baseH, baseW);
+}
+
+
+Vector2F PeaceBase::GetCenterPos(void) const
+{
+	Vector2 size = GetCurrentPeaceSize();
+
+	return Vector2F(
+		peacePos.x + size.x / 2.0f,
+		peacePos.y + size.y / 2.0f
+	);
 }
