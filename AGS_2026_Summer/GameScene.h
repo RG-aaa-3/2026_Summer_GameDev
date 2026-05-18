@@ -44,7 +44,14 @@ private:
 	cursor* Cursor;
 	std::vector<PeaceBase*> peace;
 
-	std::vector<std::string> stageList;
+	struct StageData
+	{
+		std::string text;
+		int difficultyBonus;
+	};
+
+	std::vector<StageData> stageList;
+
 	std::vector<std::string> stageFileList;
 
 	bool LoadStageFile(const std::string& filePath);
@@ -71,5 +78,31 @@ private:
 
 
 	bool CheckClear(void);
+
+	//ÉXÉRÉA
+	int totalScore = 0;
+	int lastAddScore = 0;
+
+	int currentDifficultyBonus = 10;
+
+	int puzzleStartTimeMs = 0;
+	float lastElapsedTime = 0.0f;
+	float lastTimeBonus = 1.0f;
+
+	float GetElapsedTime(void) const;
+	float CalcTimeBonus(float elapsedTime) const;
+	int CalcAddScore(float elapsedTime) const;
+	void AddClearScore(void);
+
+
+	//êßå¿éûä‘
+
+	int gameStartTimeMs = 0;
+
+	static constexpr float GAME_LIMIT_TIME = 60.0f; // êßå¿éûä‘ 60ïb
+
+	float GetGameElapsedTime(void) const;
+	float GetRemainingTime(void) const;
+	bool IsTimeUp(void) const;
 };
 

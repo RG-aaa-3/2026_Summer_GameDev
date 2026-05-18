@@ -17,7 +17,7 @@ void PeaceS::SetPeacePram(void) {
 	imgFName = "PeaceS.png";
 
 	// å≥âÊëúÉTÉCÉY
-	size = { 240, 320 };
+	size = { 320, 320 };
 
 	// èkè¨ó¶
 	wide = 1;

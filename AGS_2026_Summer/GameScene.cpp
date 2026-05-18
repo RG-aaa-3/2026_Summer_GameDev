@@ -39,6 +39,8 @@ bool GameScene::SystemInit(void)
 	if (Cursor == nullptr) return false;
 	if (Cursor->SystemInit() == false) return false;
 
+	gameStartTimeMs = GetNowCount();
+
 	// 問題ファイル一覧
 	stageFileList.push_back("data/mondai1.txt");
 	//stageFileList.push_back("data/mondai2.txt");
@@ -65,6 +67,26 @@ void GameScene::GameInit(void) {
 
 void GameScene::Update(void)
 {
+
+	if (IsTimeUp())
+	{
+		return;
+	}
+
+	if (isClear)
+	{
+		clearWaitFrame++;
+
+		if (clearWaitFrame >= CLEAR_WAIT_FRAME)
+		{
+			StartNewPuzzle();
+		}
+
+		return;
+	}
+
+
+
 	if (isClear)
 	{
 		clearWaitFrame++;
@@ -103,8 +125,11 @@ void GameScene::Update(void)
 		}
 	}
 
+
 	if (CheckClear())
 	{
+		AddClearScore();
+
 		isClear = true;
 		clearWaitFrame = 0;
 	}
@@ -137,7 +162,6 @@ void GameScene::Draw(void) {
 
 
 
-	//持っていないピースを描画
 	for (int i = 0; i < peace.size(); i++)
 	{
 		if (peace[i] == nullptr) continue;
@@ -148,19 +172,65 @@ void GameScene::Draw(void) {
 		}
 	}
 
-	// 持っているピースを描画
+	// 1. 固定済みピースを最初に描画 = 一番奥
 	for (int i = 0; i < peace.size(); i++)
 	{
 		if (peace[i] == nullptr) continue;
 
-		if (peace[i]->IsHolding() == true)
+		if (peace[i]->IsPlaced())
 		{
 			peace[i]->Draw();
 		}
 	}
 
-	// カーソルは最後
+	// 2. まだ固定されていない、かつ持っていないピース
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (!peace[i]->IsPlaced() && !peace[i]->IsHolding())
+		{
+			peace[i]->Draw();
+		}
+	}
+
+	// 3. 持っているピースを最後に描画 = ピースの中では最前面
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (peace[i]->IsHolding())
+		{
+			peace[i]->Draw();
+		}
+	}
 	Cursor->Draw();
+
+	float elapsed = isClear ? lastElapsedTime : GetElapsedTime();
+
+	float remaining = GetRemainingTime();
+
+	SetFontSize(48);
+
+	DrawFormatString(
+		1440,
+		20,
+		GetColor(255, 255, 255),
+		"SCORE\n %d",
+		totalScore
+	);
+
+	SetFontSize(24);
+
+	DrawFormatString(
+		40,
+		60,
+		GetColor(255, 255, 255),
+		"TIME : %.2f",
+		remaining
+	);
+
+
 
 	if (isClear)
 	{
@@ -170,7 +240,24 @@ void GameScene::Draw(void) {
 			"CLEAR!",
 			GetColor(255, 255, 0)
 		);
+
+
 	}
+
+	if (IsTimeUp())
+	{
+		SetFontSize(64);
+
+		DrawString(
+			780,
+			450,
+			"TIME UP!",
+			GetColor(0, 0, 0)
+		);
+
+		SetFontSize(24);
+	}
+
 
 }
 
@@ -465,8 +552,8 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 	if (p == nullptr) return;
 	if (p->IsPlaced()) return;
 
-	Vector2F pieceCenter = p->GetCenterPos();
-	Vector2 currentSize = p->GetCurrentPeaceSize();
+	// ここが重要
+	Vector2F pos = p->GetJudgePos();
 
 	const float fitRange = 60.0f;
 
@@ -485,12 +572,8 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 			continue;
 		}
 
-		Vector2F targetCenter;
-		targetCenter.x = fitTargets[i].pos.x + currentSize.x / 2.0f;
-		targetCenter.y = fitTargets[i].pos.y + currentSize.y / 2.0f;
-
-		float dx = pieceCenter.x - targetCenter.x;
-		float dy = pieceCenter.y - targetCenter.y;
+		float dx = pos.x - fitTargets[i].pos.x;
+		float dy = pos.y - fitTargets[i].pos.y;
 
 		float distSq = dx * dx + dy * dy;
 
@@ -503,7 +586,13 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 
 	if (bestIndex != -1)
 	{
-		p->SetPeacePos(fitTargets[bestIndex].pos);
+		Vector2F offset = p->GetJudgeOffset();
+
+		Vector2F snapPos;
+		snapPos.x = fitTargets[bestIndex].pos.x - offset.x;
+		snapPos.y = fitTargets[bestIndex].pos.y - offset.y;
+
+		p->SetPeacePos(snapPos);
 		p->SetPlaced(true);
 		p->SetTargetIndex(bestIndex);
 
@@ -542,6 +631,8 @@ void GameScene::ClearPieces(void)
 	peace.clear();
 	fitTargets.clear();
 }
+
+
 void GameScene::StartNewPuzzle(void)
 {
 	ClearPieces();
@@ -556,15 +647,19 @@ void GameScene::StartNewPuzzle(void)
 
 	int index = GetRand((int)stageList.size() - 1);
 
-	CreateStageFromText(stageList[index]);
+	currentDifficultyBonus = stageList[index].difficultyBonus;
 
-
-	//問題ごとにランダムに指定
-	int Outsideamount = 1 + GetRand(5);
-
+	CreateStageFromText(stageList[index].text);
 
 	// 外に出すピース数
-	MoveRandomPiecesOutside(Outsideamount);
+	MoveRandomPiecesOutside(2);
+
+	// 問題開始時間を記録
+	puzzleStartTimeMs = GetNowCount();
+
+	lastAddScore = 0;
+	lastElapsedTime = 0.0f;
+	lastTimeBonus = 1.0f;
 }
 
 bool GameScene::LoadStageFile(const std::string& filePath)
@@ -592,13 +687,38 @@ bool GameScene::LoadStageFile(const std::string& filePath)
 			continue;
 		}
 
-		stageList.push_back(line);
+		StageData data;
+
+		size_t separator = line.find('|');
+
+		if (separator != std::string::npos)
+		{
+			std::string bonusText = line.substr(0, separator);
+			std::string stageText = line.substr(separator + 1);
+
+			data.difficultyBonus = std::atoi(bonusText.c_str());
+			data.text = stageText;
+		}
+		else
+		{
+			// 古い形式にも対応
+			data.difficultyBonus = 10;
+			data.text = line;
+		}
+
+		if (data.difficultyBonus <= 0)
+		{
+			data.difficultyBonus = 10;
+		}
+
+		stageList.push_back(data);
 	}
 
 	file.close();
 
 	return !stageList.empty();
 }
+
 
 bool GameScene::LoadRandomStageFile(void)
 {
@@ -610,4 +730,67 @@ bool GameScene::LoadRandomStageFile(void)
 	int index = GetRand((int)stageFileList.size() - 1);
 
 	return LoadStageFile(stageFileList[index]);
+}
+
+
+float GameScene::GetElapsedTime(void) const
+{
+	int now = GetNowCount();
+	return (now - puzzleStartTimeMs) / 1000.0f;
+}
+
+
+float GameScene::CalcTimeBonus(float elapsedTime) const
+{
+	float timeBonus = 2.0f * (10.0f - elapsedTime);
+
+	if (timeBonus < 1.0f)
+	{
+		timeBonus = 1.0f;
+	}
+
+	return timeBonus;
+}
+
+
+int GameScene::CalcAddScore(float elapsedTime) const
+{
+	float timeBonus = CalcTimeBonus(elapsedTime);
+
+	float score = currentDifficultyBonus * timeBonus;
+
+	// 小数を四捨五入して整数スコアにする
+	return (int)(score + 0.5f);
+}
+
+void GameScene::AddClearScore(void)
+{
+	lastElapsedTime = GetElapsedTime();
+	lastTimeBonus = CalcTimeBonus(lastElapsedTime);
+
+	lastAddScore = CalcAddScore(lastElapsedTime);
+	totalScore += lastAddScore;
+}
+
+float GameScene::GetGameElapsedTime(void) const
+{
+	int now = GetNowCount();
+	return (now - gameStartTimeMs) / 1000.0f;
+}
+
+float GameScene::GetRemainingTime(void) const
+{
+	float remaining = GAME_LIMIT_TIME - GetGameElapsedTime();
+
+	if (remaining < 0.0f)
+	{
+		remaining = 0.0f;
+	}
+
+	return remaining;
+}
+
+bool GameScene::IsTimeUp(void) const
+{
+	return GetRemainingTime() <= 0.0f;
 }

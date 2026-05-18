@@ -232,3 +232,104 @@ Vector2F PeaceBase::GetCenterPos(void) const
 		peacePos.y + size.y / 2.0f
 	);
 }
+
+std::vector<std::vector<int>> PeaceBase::GetCanvasShape(void) const
+{
+	const int CANVAS = 4;
+
+	std::vector<std::vector<int>> canvas(
+		CANVAS,
+		std::vector<int>(CANVAS, 0)
+	);
+
+	for (int y = 0; y < shape.size(); y++)
+	{
+		for (int x = 0; x < shape[y].size(); x++)
+		{
+			if (y >= CANVAS || x >= CANVAS) continue;
+
+			canvas[y][x] = shape[y][x];
+		}
+	}
+
+	return canvas;
+}
+
+
+std::vector<std::vector<int>> PeaceBase::RotateShapeRight(
+	const std::vector<std::vector<int>>& src
+) const
+{
+	int h = (int)src.size();
+	int w = (int)src[0].size();
+
+	std::vector<std::vector<int>> dst(
+		w,
+		std::vector<int>(h, 0)
+	);
+
+	for (int y = 0; y < h; y++)
+	{
+		for (int x = 0; x < w; x++)
+		{
+			dst[x][h - 1 - y] = src[y][x];
+		}
+	}
+
+	return dst;
+}
+
+
+std::vector<std::vector<int>> PeaceBase::GetRotatedCanvasShape(void) const
+{
+	std::vector<std::vector<int>> result = GetCanvasShape();
+
+	int rotateCount = peaceDir % 4;
+
+	for (int i = 0; i < rotateCount; i++)
+	{
+		result = RotateShapeRight(result);
+	}
+
+	return result;
+}
+
+
+Vector2F PeaceBase::GetJudgeOffset(void) const
+{
+	std::vector<std::vector<int>> rotated = GetRotatedCanvasShape();
+
+	int minX = 999;
+	int minY = 999;
+
+	for (int y = 0; y < rotated.size(); y++)
+	{
+		for (int x = 0; x < rotated[y].size(); x++)
+		{
+			if (rotated[y][x] == 0) continue;
+
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
+		}
+	}
+
+	if (minX == 999 || minY == 999)
+	{
+		return Vector2F(0.0f, 0.0f);
+	}
+
+	return Vector2F(
+		(float)(minX * cellSize),
+		(float)(minY * cellSize)
+	);
+}
+
+Vector2F PeaceBase::GetJudgePos(void) const
+{
+	Vector2F offset = GetJudgeOffset();
+
+	return Vector2F(
+		peacePos.x + offset.x,
+		peacePos.y + offset.y
+	);
+}

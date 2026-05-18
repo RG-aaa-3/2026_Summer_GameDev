@@ -17,7 +17,7 @@ void PeaceL::SetPeacePram(void) {
 	imgFName = "PeaceL.png";
 
 	// å≥âÊëúÉTÉCÉY
-	size = { 240, 320 };
+	size = { 320, 320 };
 
 	// èkè¨ó¶
 	wide = 1;

@@ -86,6 +86,12 @@ public:
 	bool IsHolding(void) const { return isHolding; }
 
 
+	Vector2F GetJudgePos(void) const;
+	Vector2F GetJudgeOffset(void) const;
+	int GetPeaceDir(void) const { return peaceDir; }
+
+
+
 private:
 
 	int graphHandle;
@@ -102,6 +108,12 @@ private:
 	// -1‚È‚ç‚Ç‚±‚É‚à“ü‚Á‚Ä‚¢‚È‚¢
 	int targetIndex = -1;
 
+
+	std::vector<std::vector<int>> GetCanvasShape(void) const;
+	std::vector<std::vector<int>> RotateShapeRight(
+		const std::vector<std::vector<int>>& src
+	) const;
+	std::vector<std::vector<int>> GetRotatedCanvasShape(void) const;
 
 protected:
 	GameScene* gInst;
