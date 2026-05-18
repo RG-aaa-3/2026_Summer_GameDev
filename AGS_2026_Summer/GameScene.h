@@ -3,6 +3,7 @@
 #include "Vector2F.h"
 #include <vector>
 #include <string>
+#include "StDefine.h"
 
 class cursor;
 class PeaceBase;
@@ -39,6 +40,8 @@ class GameScene
 	void CheckFitPiece(PeaceBase* p);
 
 	bool IsClear(void);		
+
+	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
 private:
 	cursor* Cursor;
@@ -104,5 +107,11 @@ private:
 	float GetGameElapsedTime(void) const;
 	float GetRemainingTime(void) const;
 	bool IsTimeUp(void) const;
+
+
+
+
+	E_SCENE_ID nextSceneID;
+
 };
 
