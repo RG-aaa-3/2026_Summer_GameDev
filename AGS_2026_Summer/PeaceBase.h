@@ -55,8 +55,13 @@ public:
 
 	//ピース座標取得
 	virtual  Vector2F GetPeacePos(void) { return peacePos; }
+	
 	//画像サイズ取得
 	virtual  Vector2 GetPeaceSize(void) { return size; }
+
+	Vector2 GetDrawSize(void) const;
+	
+	
 	//掴めているか判定
 	virtual bool GetHold(void) { return isHolding; }
 
@@ -90,10 +95,13 @@ public:
 
 	bool IsHolding(void) const { return isHolding; }
 
+	Vector2F GetBodyPos(void) const;
+	void SetBodyPos(const Vector2F& bodyPos);
+
 
 	Vector2F GetJudgePos(void) const;
 	Vector2F GetJudgeOffset(void) const;
-	int GetPeaceDir(void) const { return peaceDir; }
+
 
 
 

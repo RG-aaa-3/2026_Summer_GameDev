@@ -30,7 +30,7 @@ class GameScene
 
 	void CollisionCheck(void);
 	
-
+	bool IsSameShapeDir(int type, int dirA, int dirB);
 
 
 
@@ -61,9 +61,7 @@ private:
 
 	bool LoadStageFile(const std::string& filePath);
 	bool LoadRandomStageFile(void);
-
-	bool CollisionCheckRectCenter(Vector2 cPos1, Vector2 size1, Vector2 cPos2, Vector2 size2);
-
+	bool CollisionCheckRectLeftTop(Vector2 pos1, Vector2 size1, Vector2 pos2, Vector2 size2);
 	bool isClear = false;
 	int clearWaitFrame = 0;
 

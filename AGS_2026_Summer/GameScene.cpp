@@ -173,7 +173,7 @@ void GameScene::Draw(void) {
 		}
 	}
 
-	// 1. 固定済みピースを最初に描画 = 一番奥
+	//固定済みピースを最初に描画
 	for (int i = 0; i < peace.size(); i++)
 	{
 		if (peace[i] == nullptr) continue;
@@ -184,7 +184,7 @@ void GameScene::Draw(void) {
 		}
 	}
 
-	// 2. まだ固定されていない、かつ持っていないピース
+	//まだ固定されていないかつ持っていないピース
 	for (int i = 0; i < peace.size(); i++)
 	{
 		if (peace[i] == nullptr) continue;
@@ -195,7 +195,7 @@ void GameScene::Draw(void) {
 		}
 	}
 
-	// 3. 持っているピースを最後に描画 = ピースの中では最前面
+	//持っているピースを最後に描画    (ピースの中では最前面)
 	for (int i = 0; i < peace.size(); i++)
 	{
 		if (peace[i] == nullptr) continue;
@@ -279,33 +279,26 @@ bool GameScene::Release(void) {
 
 
 
-bool GameScene::CollisionCheckRectCenter(Vector2 cPos1, Vector2 size1, Vector2 cPos2, Vector2 size2) {
+bool GameScene::CollisionCheckRectLeftTop(Vector2 pos1, Vector2 size1, Vector2 pos2, Vector2 size2)
+{
+	int left1 = pos1.x;
+	int top1 = pos1.y;
+	int right1 = pos1.x + size1.x;
+	int bottom1 = pos1.y + size1.y;
 
-	//1つ目の座標を求める
-	Vector2 stPos1 = cPos1;
-	Vector2 edPos1 = cPos1;
+	int left2 = pos2.x;
+	int top2 = pos2.y;
+	int right2 = pos2.x + size2.x;
+	int bottom2 = pos2.y + size2.y;
 
-	stPos1.x -= (size1.x / 2);
-	stPos1.y -= (size1.y / 2);
-	edPos1.x += (size1.x / 2);
-	edPos1.y += (size1.y / 2);
-
-	//2つ目
-	Vector2 stPos2 = cPos2;
-	Vector2 edPos2 = cPos2;
-
-	stPos2.x -= (size2.x / 2);
-	stPos2.y -= (size2.y / 2);
-	edPos2.x += (size2.x / 2);
-	edPos2.y += (size2.y / 2);
-
-
-	if (stPos1.x<edPos2.x &&
-		edPos1.x>stPos2.x &&
-		stPos1.y<edPos2.y &&
-		edPos1.y>stPos2.y) {
+	if (left1 < right2 &&
+		right1 > left2 &&
+		top1 < bottom2 &&
+		bottom1 > top2)
+	{
 		return true;
 	}
+
 	return false;
 }
 
@@ -362,7 +355,9 @@ void GameScene::CreateStageFromText(const std::string& text)
 				p->SetPeaceDir(dir);
 				p->SetTargetIndex(targetIndex);
 
-				p->SetPeacePos(correctPos);
+	
+				p->SetBodyPos(correctPos);
+
 				p->SetPlaced(true);
 
 				peace.push_back(p);
@@ -386,8 +381,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 1:
 		// Oミノ
 		shape = {
-			{1, 1},
-			{1, 1}
+			{1,1,0,0},
+			{1,1,0,0},
+			{0,0,0,0},
+			{0,0,0,0}
 		};
 
 		p = new PeaceO(
@@ -401,10 +398,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 2:
 		//Iミノ
 		shape = {
-			{1},
-			{1},
-			{1},
-			{1}
+			{1,0,0,0},
+			{1,0,0,0},
+			{1,0,0,0},
+			{1,0,0,0}
 		};
 
 		p = new PeaceI(
@@ -418,8 +415,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 3:
 		//Sミノ
 		shape = {
-			{0,1,1},
-			{1,1,0}
+			{0,0,1,1},
+			{0,1,1,0},
+			{0,0,0,0},
+			{0,0,0,0}
 		};
 
 		p = new PeaceS(
@@ -433,8 +432,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 4:
 		//Zミノ
 		shape = {
-			{1,1,0},
-			{0,1,1}
+			{1,1,0,0},
+			{0,1,1,0},
+			{0,0,0,0},
+			{0,0,0,0}
 		};
 
 		p = new PeaceZ(
@@ -448,9 +449,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 5:
 		//Jミノ
 		shape = {
-			{0,1},
-			{0,1},
-			{1,1}
+			{0,0,0,1},
+			{0,0,0,1},
+			{0,0,1,1},
+			{0,0,0,0}
 		};
 
 
@@ -465,9 +467,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 6:
 		//Lミノ
 		shape = {
-			{1,0},
-			{1,0},
-			{1,1}
+			{1,0,0,0},
+			{1,0,0,0},
+			{1,1,0,0},
+			{0,0,0,0}
 		};
 
 
@@ -482,8 +485,10 @@ PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 	case 7:
 		//Tミノ
 		shape = {
-			{1,1,1},
-			{0,1,0}
+			{1,1,1,0},
+			{0,1,0,0},
+			{0,0,0,0},
+			{0,0,0,0}
 		};
 
 
@@ -535,12 +540,16 @@ void GameScene::MoveRandomPiecesOutside(int count)
 		p->SetTargetIndex(-1);
 		p->SetPlaced(false);
 
+		// ここで外に出したピースの向きをランダムにする
+		int randomDir = GetRand(3); // 0,1,2,3
+		p->SetPeaceDir(randomDir);
+
 		Vector2F outPos;
 		outPos.x = 500.0f + moved * 100.0f;
-		outPos.y = 600.0f;
+		outPos.y = 760.0f;
 
-		p->SetPeacePos(outPos);
-		p->SetPlaced(false);
+		// 画像キャンバスではなく、ミノ本体をこの位置に置きたい場合
+		p->SetBodyPos(outPos);
 
 		moved++;
 
@@ -556,7 +565,7 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 	if (p == nullptr) return;
 	if (p->IsPlaced()) return;
 
-	// ここが重要
+
 	Vector2F pos = p->GetJudgePos();
 
 	const float fitRange = 60.0f;
@@ -577,7 +586,7 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 		}
 
 		// 正解方向と違うなら入らない
-		if (fitTargets[i].dir != p->GetPeaceDir())
+		if (!IsSameShapeDir(p->GetPeaceType(), p->GetPeaceDir(), fitTargets[i].dir))
 		{
 			continue;
 		}
@@ -596,13 +605,8 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 
 	if (bestIndex != -1)
 	{
-		Vector2F offset = p->GetJudgeOffset();
+		p->SetBodyPos(fitTargets[bestIndex].pos);
 
-		Vector2F snapPos;
-		snapPos.x = fitTargets[bestIndex].pos.x - offset.x;
-		snapPos.y = fitTargets[bestIndex].pos.y - offset.y;
-
-		p->SetPeacePos(snapPos);
 		p->SetPlaced(true);
 		p->SetTargetIndex(bestIndex);
 
@@ -850,4 +854,44 @@ bool GameScene::ParseStageCell(const std::string& cell, int& type, int& dir)
 	dir = 0;
 
 	return type != 0;
+}
+
+bool GameScene::IsSameShapeDir(int type, int dirA, int dirB)
+{
+	dirA = dirA % 4;
+	dirB = dirB % 4;
+
+	switch (type)
+	{
+	case 1:
+		// Oミノ：全方向同じ
+		return true;
+
+	case 2:
+		// Iミノ：上=下、右=左
+		return (dirA % 2) == (dirB % 2);
+
+	case 3:
+		// Sミノ：上=下、右=左
+		return (dirA % 2) == (dirB % 2);
+
+	case 4:
+		// Zミノ：上=下、右=左
+		return (dirA % 2) == (dirB % 2);
+
+	case 5:
+		// Jミノ：4方向すべて別
+		return dirA == dirB;
+
+	case 6:
+		// Lミノ：4方向すべて別
+		return dirA == dirB;
+
+	case 7:
+		// Tミノ：基本は4方向すべて別
+		return dirA == dirB;
+
+	default:
+		return dirA == dirB;
+	}
 }

@@ -61,6 +61,9 @@ bool SceneManager::SystemInit(void) {
 
 
 void SceneManager::Update(void) {
+#if 0
+
+
 	fader->Update();
 	//シーンチェンジ実行中
 	//フェードアウト
@@ -75,6 +78,7 @@ void SceneManager::Update(void) {
 
 	}
 	else {
+#endif
 		E_SCENE_ID nextSceneID = scene_ID;
 
 		//各シーンUpdate処理
@@ -112,7 +116,7 @@ void SceneManager::Update(void) {
 	
 
 
-}
+
 
 void SceneManager::Draw(void) {
 	//同上

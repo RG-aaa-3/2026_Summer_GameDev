@@ -137,70 +137,59 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 
  void PeaceBase::Draw(void)
  {
-	 Vector2 currentSize = GetCurrentPeaceSize();
-
-	 float centerX = peacePos.x + currentSize.x / 2.0f;
-	 float centerY = peacePos.y + currentSize.y / 2.0f;
+	 Vector2 drawSize = GetDrawSize();
 
 	 double angle = 0.0;
 
 	 switch (peaceDir)
 	 {
-	 case 0:
-		 angle = 0.0;
-		 break;
-
-	 case 1:
-		 angle = DX_PI / 2.0;
-		 break;
-
-	 case 2:
-		 angle = DX_PI;
-		 break;
-
-	 case 3:
-		 angle = DX_PI * 3.0 / 2.0;
-		 break;
+	 case 0: angle = 0.0; break;
+	 case 1: angle = DX_PI / 2.0; break;
+	 case 2: angle = DX_PI; break;
+	 case 3: angle = DX_PI * 3.0 / 2.0; break;
 	 }
+
+	 float centerX = peacePos.x + drawSize.x / 2.0f;
+	 float centerY = peacePos.y + drawSize.y / 2.0f;
+
+	 double scale = (double)drawSize.x / (double)size.x;
 
 	 DrawRotaGraph(
 		 (int)centerX,
 		 (int)centerY,
-		 1.0 / wide,
+		 scale,
 		 angle,
 		 peace_img[0],
 		 true
 	 );
+#if 0
+	 // デバッグ赤枠
+	 DrawBox(
+		 (int)peacePos.x,
+		 (int)peacePos.y,
+		 (int)(peacePos.x + drawSize.x),
+		 (int)(peacePos.y + drawSize.y),
+		 GetColor(255, 0, 0),
+		 false
+	 );
+#endif
  }
 
+ bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos)
+ {
+	 Vector2 drawSize = GetDrawSize();
 
-bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos) {
-	for (int row = 0; row < shape.size(); row++)
-	{
-		for (int col = 0; col < shape[row].size(); col++)
-		{
-			if (shape[row][col] == 0) continue;
+	 float left = peacePos.x;
+	 float top = peacePos.y;
+	 float right = peacePos.x + drawSize.x;
+	 float bottom = peacePos.y + drawSize.y;
 
-			float chipX = peacePos.x + col * cellSize;
-			float chipY = peacePos.y + row * cellSize;
-
-			if (
-				cursorPos.x >= chipX &&
-				cursorPos.x < chipX + cellSize &&
-				cursorPos.y >= chipY &&
-				cursorPos.y < chipY + cellSize
-				)
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-
-
-
-}
+	 return
+		 cursorPos.x >= left &&
+		 cursorPos.x <= right &&
+		 cursorPos.y >= top &&
+		 cursorPos.y <= bottom;
+ }
 
 Vector2 PeaceBase::GetCurrentPeaceSize(void) const
 {
@@ -318,10 +307,17 @@ Vector2F PeaceBase::GetJudgeOffset(void) const
 		return Vector2F(0.0f, 0.0f);
 	}
 
-	return Vector2F(
+	Vector2F offset(
 		(float)(minX * cellSize),
 		(float)(minY * cellSize)
 	);
+
+	if (peaceType == 9 && peaceDir == 9)
+	{
+		offset.y += cellSize;
+	}
+
+	return offset;
 }
 
 Vector2F PeaceBase::GetJudgePos(void) const
@@ -332,4 +328,32 @@ Vector2F PeaceBase::GetJudgePos(void) const
 		peacePos.x + offset.x,
 		peacePos.y + offset.y
 	);
+}
+
+Vector2 PeaceBase::GetDrawSize(void) const
+{
+	Vector2 drawSize;
+
+	drawSize.x = size.x / wide;
+	drawSize.y = size.y / wide;
+
+	return drawSize;
+}
+
+Vector2F PeaceBase::GetBodyPos(void) const
+{
+	Vector2F offset = GetJudgeOffset();
+
+	return Vector2F(
+		peacePos.x + offset.x,
+		peacePos.y + offset.y
+	);
+}
+
+void PeaceBase::SetBodyPos(const Vector2F& bodyPos)
+{
+	Vector2F offset = GetJudgeOffset();
+
+	peacePos.x = bodyPos.x - offset.x;
+	peacePos.y = bodyPos.y - offset.y;
 }
