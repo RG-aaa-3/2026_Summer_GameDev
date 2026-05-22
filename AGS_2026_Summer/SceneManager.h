@@ -1,5 +1,10 @@
 #pragma once
 #include "GameScene.h"
+#include "SceneTitle.h"
+#include "SceneSelect.h"
+
+class TitleScene;
+
 
 class SceneManager
 {public:
@@ -20,7 +25,9 @@ class SceneManager
 
 private:
 	GameScene* gs;
-
+	TitleScene* Ti;
+	SceneSelect* Se;
+	
 
 	void Update(void);
 	void Draw(void);

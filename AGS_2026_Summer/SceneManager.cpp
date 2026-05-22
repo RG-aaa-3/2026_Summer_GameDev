@@ -6,7 +6,9 @@
 
 
 SceneManager::SceneManager(void) {
+	Ti = nullptr;
 	gs = nullptr;
+	Se = nullptr;
 }
 
 SceneManager::~SceneManager(void) {
@@ -36,9 +38,15 @@ bool SceneManager::SystemInit(void) {
 
 	gs = new GameScene();
 	if (gs == nullptr)return false;
-
-
 	if (gs ->SystemInit() == false)return false;
+	
+	Ti = new TitleScene();
+	if (Ti == nullptr)return false;
+	if (Ti->SystemInit() == false)return false;
+
+	Se = new SceneSelect();
+	if (Se == nullptr)return false;
+	if (Se->SystemInit() == false)return false;
 
 
 	return true;
@@ -59,8 +67,8 @@ void SceneManager::Draw(void) {
 	SetDrawScreen(DX_SCREEN_BACK);			// •`‰æ‚·‚é‰æ–Ê‚ð— ‚Ì‰æ–Ê‚ÉÝ’è‚·‚é
 	ClearDrawScreen();						// •`‰æ‚·‚é‰æ–Ê‚Ì“à—e‚ðÁ‹Ž‚·‚é
 
-	gs->Draw();
-
+	Ti->Draw();
+	Se->Draw();
 
 
 	ScreenFlip();
