@@ -27,6 +27,10 @@ private:
 	GameScene* gs;
 	TitleScene* Ti;
 	SceneSelect* Se;
+
+	bool SceneChangeFlg;
+
+	bool ChangeScene(E_SCENE_ID id);
 	
 
 	void Update(void);

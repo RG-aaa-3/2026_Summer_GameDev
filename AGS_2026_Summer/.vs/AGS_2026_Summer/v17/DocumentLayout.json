@@ -3,6 +3,34 @@
   "WorkspaceRootPath": "C:\\AGS2026_summer\\AGS_2026_Summer\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneManager.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneSelect.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneSelect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\StDefine.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:StDefine.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneTitle.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:SceneTitle.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|C:\\AGS2026_summer\\AGS_2026_Summer\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{6B903057-EB3C-4B25-8A30-F55766DF4EFB}|AGS_2026_Summer.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
@@ -14,11 +42,96 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SceneSelect.h",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.h",
+              "RelativeDocumentMoniker": "SceneSelect.h",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.h",
+              "RelativeToolTip": "SceneSelect.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-05-18T04:09:14.136Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SceneSelect.cpp",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.cpp",
+              "RelativeDocumentMoniker": "SceneSelect.cpp",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneSelect.cpp",
+              "RelativeToolTip": "SceneSelect.cpp",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-05-18T04:09:37.072Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SceneManager.cpp",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.cpp",
+              "RelativeDocumentMoniker": "SceneManager.cpp",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.cpp",
+              "RelativeToolTip": "SceneManager.cpp",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAADAAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-05-18T03:27:52.374Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "SceneManager.h",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.h",
+              "RelativeDocumentMoniker": "SceneManager.h",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneManager.h",
+              "RelativeToolTip": "SceneManager.h",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACAAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-05-18T03:11:06.149Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "StDefine.h",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\StDefine.h",
+              "RelativeDocumentMoniker": "StDefine.h",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\StDefine.h",
+              "RelativeToolTip": "StDefine.h",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-05-17T07:59:34.445Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SceneTitle.cpp",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.cpp",
+              "RelativeDocumentMoniker": "SceneTitle.cpp",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.cpp",
+              "RelativeToolTip": "SceneTitle.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-05-15T06:09:08.258Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SceneTitle.h",
+              "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.h",
+              "RelativeDocumentMoniker": "SceneTitle.h",
+              "ToolTip": "C:\\AGS2026_summer\\AGS_2026_Summer\\SceneTitle.h",
+              "RelativeToolTip": "SceneTitle.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-05-15T06:08:35.937Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "main.cpp",
               "DocumentMoniker": "C:\\AGS2026_summer\\AGS_2026_Summer\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
@@ -26,8 +139,7 @@
               "RelativeToolTip": "main.cpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-04-20T06:08:37.04Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-20T06:08:37.04Z"
             }
           ]
         }

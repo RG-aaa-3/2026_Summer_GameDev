@@ -19,7 +19,45 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsoUtility.cpp" />
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PeaceBase.cpp" />
+    <ClCompile Include="PeaceI.cpp" />
+    <ClCompile Include="PeaceJ.cpp" />
+    <ClCompile Include="PeaceL.cpp" />
+    <ClCompile Include="PeaceO.cpp" />
+    <ClCompile Include="PeaceS.cpp" />
+    <ClCompile Include="PeaceT.cpp" />
+    <ClCompile Include="PeaceZ.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneSelect.cpp" />
+    <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector2F.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AsoUtility.h" />
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="PeaceBase.h" />
+    <ClInclude Include="PeaceI.h" />
+    <ClInclude Include="PeaceJ.h" />
+    <ClInclude Include="PeaceL.h" />
+    <ClInclude Include="PeaceO.h" />
+    <ClInclude Include="PeaceS.h" />
+    <ClInclude Include="PeaceT.h" />
+    <ClInclude Include="PeaceZ.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneSelect.h" />
+    <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="StDefine.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector2F.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
