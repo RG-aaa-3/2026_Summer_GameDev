@@ -318,7 +318,6 @@ void GameScene::CreateStageFromText(const std::string& text)
 
 	int row = 0;
 
-	// "/" で行を分ける
 	while (std::getline(rowStream, rowText, '/'))
 	{
 		std::stringstream colStream(rowText);
@@ -326,17 +325,17 @@ void GameScene::CreateStageFromText(const std::string& text)
 
 		int col = 0;
 
-		// "," で列を分ける
 		while (std::getline(colStream, cell, ','))
 		{
+			int type = 0;
+			int dir = 0;
+
 			// 空白マス
-			if (cell.empty() || cell == "0")
+			if (ParseStageCell(cell, type, dir) == false)
 			{
 				col++;
 				continue;
 			}
-
-			int type = std::atoi(cell.c_str());
 
 			int x = BOARD_ORIGIN_X + col * CELL_SIZE;
 			int y = BOARD_ORIGIN_Y + row * CELL_SIZE;
@@ -346,6 +345,7 @@ void GameScene::CreateStageFromText(const std::string& text)
 			// 正解スロットを作る
 			FitTarget target;
 			target.type = type;
+			target.dir = dir;
 			target.pos = correctPos;
 			target.occupied = true;
 
@@ -359,6 +359,7 @@ void GameScene::CreateStageFromText(const std::string& text)
 			{
 				p->SetCorrectPos(correctPos);
 				p->SetPeaceType(type);
+				p->SetPeaceDir(dir);
 				p->SetTargetIndex(targetIndex);
 
 				p->SetPeacePos(correctPos);
@@ -373,6 +374,8 @@ void GameScene::CreateStageFromText(const std::string& text)
 		row++;
 	}
 }
+
+
 PeaceBase* GameScene::CreatePeaceByType(int type, int x, int y) {
 
 	std::vector<std::vector<int>> shape;
@@ -569,6 +572,12 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 		}
 
 		if (fitTargets[i].type != p->GetPeaceType())
+		{
+			continue;
+		}
+
+		// 正解方向と違うなら入らない
+		if (fitTargets[i].dir != p->GetPeaceDir())
 		{
 			continue;
 		}
@@ -794,4 +803,51 @@ float GameScene::GetRemainingTime(void) const
 bool GameScene::IsTimeUp(void) const
 {
 	return GetRemainingTime() <= 0.0f;
+}
+
+
+bool GameScene::ParseStageCell(const std::string& cell, int& type, int& dir)
+{
+	type = 0;
+
+	// 指定なしなら上向き
+	dir = 0;
+
+	if (cell.empty() || cell == "0")
+	{
+		return false;
+	}
+
+	// [2]7 のような形式
+	if (cell[0] == '[')
+	{
+		size_t closePos = cell.find(']');
+
+		if (closePos == std::string::npos)
+		{
+			return false;
+		}
+
+		std::string dirText = cell.substr(1, closePos - 1);
+		std::string typeText = cell.substr(closePos + 1);
+
+		int dirNo = std::atoi(dirText.c_str());
+		type = std::atoi(typeText.c_str());
+
+		// 1=上, 2=右, 3=下, 4=左
+		if (dirNo < 1 || dirNo > 4)
+		{
+			dirNo = 1;
+		}
+
+		dir = dirNo - 1;
+
+		return type != 0;
+	}
+
+	// 古い形式：1,2,3 など
+	type = std::atoi(cell.c_str());
+	dir = 0;
+
+	return type != 0;
 }

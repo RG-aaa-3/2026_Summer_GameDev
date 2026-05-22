@@ -56,6 +56,8 @@ private:
 	std::vector<StageData> stageList;
 
 	std::vector<std::string> stageFileList;
+	
+	bool ParseStageCell(const std::string& cell, int& type, int& dir);
 
 	bool LoadStageFile(const std::string& filePath);
 	bool LoadRandomStageFile(void);
@@ -68,6 +70,7 @@ private:
 	struct FitTarget
 	{
 		int type;
+		int dir;
 		Vector2F pos;
 		bool occupied;
 	};

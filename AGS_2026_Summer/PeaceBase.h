@@ -61,6 +61,11 @@ public:
 	virtual bool GetHold(void) { return isHolding; }
 
 
+	//ピース方向設定&取得
+	void SetPeaceDir(int dir) { peaceDir = dir; }
+	int GetPeaceDir(void) const { return peaceDir; }
+
+
 
 	//正解場所判定
 	void SetCorrectPos(const Vector2F& pos) { correctPos = pos; }
@@ -107,6 +112,7 @@ private:
 	// 現在どの正解スロットに入っているか
 	// -1ならどこにも入っていない
 	int targetIndex = -1;
+
 
 
 	std::vector<std::vector<int>> GetCanvasShape(void) const;
