@@ -3,8 +3,8 @@
 
 class GameScene;
 class Fader;
-
-
+class Result;
+class TitleScene;
 
 
 class SceneManager
@@ -25,10 +25,11 @@ class SceneManager
 
 
 
-
 private:
 	GameScene* gs;
 	Fader* fader;
+	Result* rs;
+	TitleScene* title;
 
 	void Update(void);
 	void Draw(void);
@@ -42,7 +43,7 @@ private:
 	bool ChangeScene(E_SCENE_ID  id);
 	void ReleaseScene(E_SCENE_ID id);
 
-
+	int resultScore = 0;
 
 };
 

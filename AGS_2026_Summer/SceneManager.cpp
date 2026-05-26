@@ -2,14 +2,15 @@
 #include <DxLib.h>
 #include "GameScene.h"
 #include "Fader.h"
-
-
+#include "Result.h"
+#include "SceneTitle.h"
 
 
 SceneManager::SceneManager(void) {
 	gs = nullptr;
 	fader = nullptr;
-
+	rs = nullptr;
+	title = nullptr;
 
 
 	scene_ID = waitScene = E_SCENE_NON;
@@ -34,7 +35,7 @@ bool SceneManager::SystemInit(void) {
 	// システム処理
 	SetWindowText("2516001 有迫　勇智");						// ゲームウィンドウのタイトル
 	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);		// ゲームウィンドウのサイズと色モードを設定
-	ChangeWindowMode(true);									// ゲームウィンドウの表示方法(false = フルスクリーン)
+	ChangeWindowMode(false);									// ゲームウィンドウの表示方法(false = フルスクリーン)
 
 	if (DxLib_Init() == -1) {
 		return false;	//初期化失敗のためエラー終了
@@ -46,11 +47,11 @@ bool SceneManager::SystemInit(void) {
 	//インスタンス作成
 	fader = new Fader();
 	if (fader == nullptr)return false;
-	SetTransColor(0xff, 0x00, 0xff);//透過色の設定
+
 	fader->SystemInit();
 	sceneChaneFlg = false;
-	ChangeScene(E_SCENE_GAME);
-	waitScene = E_SCENE_GAME;
+	ChangeScene(E_SCENE_TITLE);
+	waitScene = E_SCENE_TITLE;
 
 
 
@@ -60,60 +61,70 @@ bool SceneManager::SystemInit(void) {
 
 
 
-void SceneManager::Update(void) {
-#if 0
-
-
+void SceneManager::Update(void)
+{
 	fader->Update();
-	//シーンチェンジ実行中
-	//フェードアウト
-	if (fader->IsEnd() && waitScene != E_SCENE_NON) {
+
+	// フェードアウトが終わったら、待機中のシーンへ切り替え
+	if (fader->IsEnd() && waitScene != E_SCENE_NON)
+	{
 		ChangeScene(waitScene);
 		waitScene = E_SCENE_NON;
 		fader->SetFade(E_STAT_FADE_IN);
+		return;
 	}
-	//フェードイン
-	else if (fader->IsEnd() && waitScene == E_SCENE_NON) {
-		sceneChaneFlg = false;
 
+	// フェード中は現在シーンのUpdateを止める
+	if (!fader->IsEnd())
+	{
+		return;
 	}
-	else {
-#endif
-		E_SCENE_ID nextSceneID = scene_ID;
 
-		//各シーンUpdate処理
+	// ここから通常時のシーン更新
+	E_SCENE_ID nextSceneID = scene_ID;
 
-		switch (scene_ID) {
-		case E_SCENE_TITLE:
+	switch (scene_ID)
+	{
+	case E_SCENE_TITLE:
+		if (title != nullptr) {
+			title->UpDate();
+			nextSceneID = title->GetNextSceneID();
+		}
+		break;
 
-			break;
+	case E_SCENE_MODE:
+		break;
 
-		case E_SCENE_MODE:
-
-			break;
-		
-		case E_SCENE_GAME:
+	case E_SCENE_GAME:
+		if (gs != nullptr)
+		{
 			gs->Update();
 			nextSceneID = gs->GetNextSceneID();
-
-			break;
-
-		case E_SCENE_RESULT:
-
-			break;
-
 		}
+		break;
 
-		//シーン遷移判定
-		if (scene_ID != nextSceneID) {
-			sceneChaneFlg = true;
-			waitScene = nextSceneID;
-			fader->SetFade(E_STAT_FADE_OUT);
+	case E_SCENE_RESULT:
+		if (rs != nullptr)
+		{
+			rs->Update();
+			nextSceneID = rs->GetNextSceneID();
 		}
-
+		break;
 	}
 
-	
+	if (scene_ID != nextSceneID) {
+
+		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT) {
+			if (gs != nullptr) {
+				resultScore = gs->GetScore();
+			}
+		}
+
+		sceneChaneFlg = true;
+		waitScene = nextSceneID;
+		fader->SetFade(E_STAT_FADE_OUT);
+	}
+}
 
 
 
@@ -125,7 +136,7 @@ void SceneManager::Draw(void) {
 
 	switch (scene_ID) {
 	case E_SCENE_TITLE:
-
+		title->Draw();
 		break;
 
 	case E_SCENE_MODE:
@@ -137,7 +148,7 @@ void SceneManager::Draw(void) {
 		break;
 
 	case E_SCENE_RESULT:
-
+		rs->Draw();
 		break;
 
 	}
@@ -176,7 +187,14 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 	scene_ID = id;
 	switch (scene_ID) {
 	case E_SCENE_TITLE:
+		if (title == nullptr)
+		{
+			title = new TitleScene();
+			if (title == nullptr)return false;
+			title->SystemInit();
+			title->GameInit();
 
+		}
 		break;
 
 	case E_SCENE_MODE:
@@ -194,6 +212,14 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_RESULT:
+		if (rs == nullptr) {
+			rs = new Result();
+			if (rs == nullptr) return false;
+
+			rs->SystemInit();
+			rs->SetScore(resultScore);
+			rs->GameInit();
+		}
 
 		break;
 
@@ -208,9 +234,13 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 
 
 
-	switch (scene_ID) {
+	switch (id) {
 	case E_SCENE_TITLE:
-
+		if (title != nullptr) {
+			title->Release();
+			delete title;
+			title = nullptr;
+		}
 		break;
 
 	case E_SCENE_MODE:
@@ -226,7 +256,11 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_RESULT:
-
+		if (rs != nullptr) {
+			rs->Release();
+			delete rs;
+			rs = nullptr;
+		}
 		break;
 
 	}

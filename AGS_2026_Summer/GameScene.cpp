@@ -62,7 +62,7 @@ bool GameScene::SystemInit(void)
 void GameScene::GameInit(void) {
 	Cursor->GameInit();
 
-
+	nextSceneID = E_SCENE_GAME;
 }
 
 
@@ -71,6 +71,11 @@ void GameScene::Update(void)
 
 	if (IsTimeUp())
 	{
+		timeupWaitFrame++;
+		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME) {
+			nextSceneID = E_SCENE_RESULT;
+			
+		}
 		return;
 	}
 
@@ -253,7 +258,7 @@ void GameScene::Draw(void) {
 			780,
 			450,
 			"TIME UP!",
-			GetColor(0, 0, 0)
+			GetColor(0, 34, 204)
 		);
 
 		SetFontSize(24);
@@ -266,11 +271,13 @@ void GameScene::Draw(void) {
 
 bool GameScene::Release(void) {
 
-	Cursor->Release();
-	delete Cursor;
-	Cursor = nullptr;
+	ClearPieces();
 
-
+	if (Cursor != nullptr) {
+		Cursor->Release();
+		delete Cursor;
+		Cursor = nullptr;
+	}
 
 	return true;
 }

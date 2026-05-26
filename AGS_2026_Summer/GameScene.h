@@ -43,6 +43,8 @@ class GameScene
 
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
+	int GetScore(void) { return totalScore; }
+
 private:
 	cursor* Cursor;
 	std::vector<PeaceBase*> peace;
@@ -63,7 +65,7 @@ private:
 	bool LoadRandomStageFile(void);
 	bool CollisionCheckRectLeftTop(Vector2 pos1, Vector2 size1, Vector2 pos2, Vector2 size2);
 	bool isClear = false;
-	int clearWaitFrame = 0;
+
 
 	struct FitTarget
 	{
@@ -76,6 +78,11 @@ private:
 	std::vector<FitTarget> fitTargets;
 
 	static constexpr int CLEAR_WAIT_FRAME = 60; // 60ÉtÉåÅ[ÉÄë“Ç¡ÇƒéüÇÃñ‚ëËÇ÷
+	int clearWaitFrame = 0;
+
+	static constexpr int TIME_UP_WAIT_FRAME = 180;
+	int timeupWaitFrame = 0;
+
 
 	void StartNewPuzzle(void);
 	void ClearPieces(void);
