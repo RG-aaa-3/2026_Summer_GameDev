@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include "ModeSelect.h"
 
 
 Result::Result(void) {
@@ -18,7 +19,10 @@ Result::Result(void) {
 	prevNextKey = 0;
 	nowNextKey = 0;
 
+	clear = false;
 
+
+	mode = nullptr;
 
 }
 
@@ -66,6 +70,8 @@ void Result::Update() {
 
 
 void Result::Draw() {
+	int p = borderPoint;
+
 
 		SetFontSize(48);
 
@@ -75,6 +81,10 @@ void Result::Draw() {
 		DrawFormatString(240, 320, GetColor(0, 180, 0), "4th:%d", fourcescore);
 		DrawFormatString(240, 400, GetColor(255, 255, 255), "You:%d", myscore);
 	
+
+		DrawFormatString(240, 500, GetColor(255, 0, 0),"BORDER:%d", p);
+		if (clear)DrawFormatString(480, 160, GetColor(255, 0, 0),"LEVEL CLEAR!!");
+		if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 255), "LEVEL FAILED...");
 
 }
 
@@ -106,10 +116,13 @@ void Result::HighScoreUpdate()
 	SaveHighScoreFile();
 }
 
-void Result::SetScore(int score)
+void Result::SetResultData(int score, int border)
 {
 	myscore = score;
+	borderPoint = border;
+
 	HighScoreUpdate();
+	IsBorderCleard();
 }
 
 bool Result::LoadHighScoreFile(void)
@@ -152,4 +165,14 @@ bool Result::SaveHighScoreFile(void)
 	file.close();
 
 	return true;
+}
+
+void Result::IsBorderCleard(void) {
+
+	if (myscore >= borderPoint) {
+		clear = true;
+	}
+	else {
+		clear = false;
+	}
 }

@@ -32,7 +32,7 @@ void TitleScene::UpDate(void)
 	prevSpaceKey = nowSpaceKey;
 	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
 
-	if (prevSpaceKey == 1 && nowSpaceKey == 0) nextSceneID = E_SCENE_GAME;
+	if (prevSpaceKey == 1 && nowSpaceKey == 0) nextSceneID = E_SCENE_MODE;
 }
 
 void TitleScene::Draw(void)

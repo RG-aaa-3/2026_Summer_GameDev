@@ -102,8 +102,7 @@ public:
 	Vector2F GetJudgePos(void) const;
 	Vector2F GetJudgeOffset(void) const;
 
-
-
+	Vector2 GetBodySize(void) const;
 
 private:
 

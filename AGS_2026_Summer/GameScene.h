@@ -46,6 +46,8 @@ class GameScene
 	int GetScore(void) { return totalScore; }
 
 private:
+
+
 	cursor* Cursor;
 	std::vector<PeaceBase*> peace;
 
@@ -54,6 +56,33 @@ private:
 		std::string text;
 		int difficultyBonus;
 	};
+
+	enum class GAME_PHASE
+	{
+		READY,
+		GO,
+		PLAY
+	};
+
+
+
+	GAME_PHASE gamePhase;
+
+	int readyImg = -1;		//Readyイメージハンドル番号
+	int goImg = -1;			//Goイメージハンドル番号
+
+	int startCountFrame = 0;
+
+	// 後から変更しやすい表示時間
+	int readyDisplayFrame = 40; // 60フレーム = 約1秒
+	int goDisplayFrame = 50;
+
+	void UpdateStartSequence(void);
+	void DrawStartSequence(void);
+	void BeginPlay(void);
+
+
+
 
 	std::vector<StageData> stageList;
 
@@ -117,9 +146,21 @@ private:
 	bool IsTimeUp(void) const;
 
 
-
+	int haikei;			//背景ハンドル番号
 
 	E_SCENE_ID nextSceneID;
+
+	//外枠表示
+	bool hasGuideFrame = false;
+
+	float guideLeft = 0.0f;
+	float guideTop = 0.0f;
+	float guideRight = 0.0f;
+	float guideBottom = 0.0f;
+
+	void ResetGuideFrame(void);
+	void AddGuideFrameRect(const Vector2F& pos, const Vector2& size);
+	void DrawGuideFrame(void);
 
 };
 

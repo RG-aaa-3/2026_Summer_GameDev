@@ -36,22 +36,35 @@ bool GameScene::SystemInit(void)
 	isClear = false;
 	clearWaitFrame = 0;
 
+	gamePhase = GAME_PHASE::READY;
+	startCountFrame = 0;
+
 	Cursor = new cursor();
 	if (Cursor == nullptr) return false;
 	if (Cursor->SystemInit() == false) return false;
 
-	gameStartTimeMs = GetNowCount();
+	readyImg = LoadGraph("Screen/Ready.png");
+	if (readyImg == -1) return false;
+
+	goImg = LoadGraph("Screen/Go.png");
+	if (goImg == -1) return false;
+	
+	haikei = LoadGraph("Screen/haikei.png");
+	if (haikei == -1)	return false;
+
 
 	// 問題ファイル一覧
 	stageFileList.push_back("data/mondai1.txt");
-	//stageFileList.push_back("data/mondai2.txt");
-	//stageFileList.push_back("data/mondai3.txt");
-
-	// ランダムで1つの問題ファイルを読み込む
-	if (LoadRandomStageFile() == false)
-	{
-		return false;
-	}
+	stageFileList.push_back("data/mondai2.txt");
+	stageFileList.push_back("data/mondai3.txt");
+	stageFileList.push_back("data/mondai4.txt");
+	stageFileList.push_back("data/mondai5.txt");
+	stageFileList.push_back("data/mondai6.txt");
+	stageFileList.push_back("data/mondai7.txt");
+	stageFileList.push_back("data/mondai8.txt");
+	stageFileList.push_back("data/mondai9.txt");
+	stageFileList.push_back("data/mondai10.txt");
+	stageFileList.push_back("data/mondai11.txt");
 
 	StartNewPuzzle();
 
@@ -68,30 +81,24 @@ void GameScene::GameInit(void) {
 
 void GameScene::Update(void)
 {
+	//ゲーム開始前
+	if (gamePhase != GAME_PHASE::PLAY)
+	{
+		UpdateStartSequence();
+		return;
+	}
 
 	if (IsTimeUp())
 	{
 		timeupWaitFrame++;
-		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME) {
-			nextSceneID = E_SCENE_RESULT;
-			
-		}
-		return;
-	}
 
-	if (isClear)
-	{
-		clearWaitFrame++;
-
-		if (clearWaitFrame >= CLEAR_WAIT_FRAME)
+		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME)
 		{
-			StartNewPuzzle();
+			nextSceneID = E_SCENE_RESULT;
 		}
 
 		return;
 	}
-
-
 
 	if (isClear)
 	{
@@ -108,11 +115,10 @@ void GameScene::Update(void)
 	Cursor->Update();
 
 	Vector2F cursorPos = Cursor->GetPos();
-	bool holdButton = CheckHitKey(KEY_INPUT_SPACE);		//スペースで掴む
 
-
-	bool rotateLeftButton = CheckHitKey(KEY_INPUT_V);	//左回転
-	bool rotateRightButton = CheckHitKey(KEY_INPUT_N);	//右回転
+	bool holdButton = CheckHitKey(KEY_INPUT_SPACE);
+	bool rotateLeftButton = CheckHitKey(KEY_INPUT_V);
+	bool rotateRightButton = CheckHitKey(KEY_INPUT_N);
 
 	for (int i = 0; i < peace.size(); i++)
 	{
@@ -131,7 +137,6 @@ void GameScene::Update(void)
 		}
 	}
 
-
 	if (CheckClear())
 	{
 		AddClearScore();
@@ -139,12 +144,15 @@ void GameScene::Update(void)
 		isClear = true;
 		clearWaitFrame = 0;
 	}
-
 }
-
 void GameScene::Draw(void) {
+	
+	
+	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
 
+	DrawGuideFrame();
 
+#if 0
 
 	//---------------------------------------------
 	//デバッグ用のグリッド線
@@ -165,7 +173,7 @@ void GameScene::Draw(void) {
 		peace[i]->Draw();
 	}
 	//---------------------------------------------
-
+#endif
 
 
 	for (int i = 0; i < peace.size(); i++)
@@ -226,7 +234,7 @@ void GameScene::Draw(void) {
 		totalScore
 	);
 
-	SetFontSize(24);
+
 
 	DrawFormatString(
 		40,
@@ -236,6 +244,9 @@ void GameScene::Draw(void) {
 		remaining
 	);
 
+
+	//Ready・Goの表示
+	DrawStartSequence();
 
 
 	if (isClear)
@@ -261,9 +272,8 @@ void GameScene::Draw(void) {
 			GetColor(0, 34, 204)
 		);
 
-		SetFontSize(24);
-	}
 
+	}
 
 }
 
@@ -272,6 +282,18 @@ void GameScene::Draw(void) {
 bool GameScene::Release(void) {
 
 	ClearPieces();
+
+	if (readyImg != -1)
+	{
+		DeleteGraph(readyImg);
+		readyImg = -1;
+	}
+
+	if (goImg != -1)
+	{
+		DeleteGraph(goImg);
+		goImg = -1;
+	}
 
 	if (Cursor != nullptr) {
 		Cursor->Release();
@@ -311,6 +333,8 @@ bool GameScene::CollisionCheckRectLeftTop(Vector2 pos1, Vector2 size1, Vector2 p
 
 void GameScene::CreateStageFromText(const std::string& text)
 {
+
+	ResetGuideFrame();
 	fitTargets.clear();
 
 	std::stringstream rowStream(text);
@@ -355,17 +379,18 @@ void GameScene::CreateStageFromText(const std::string& text)
 			// ピース生成
 			PeaceBase* p = CreatePeaceByType(type, x, y);
 
-			if (p != nullptr)
+			if(p != nullptr)
 			{
 				p->SetCorrectPos(correctPos);
 				p->SetPeaceType(type);
 				p->SetPeaceDir(dir);
 				p->SetTargetIndex(targetIndex);
 
-	
 				p->SetBodyPos(correctPos);
-
 				p->SetPlaced(true);
+
+				// 外枠用に、このピース本体の範囲を追加
+				AddGuideFrameRect(correctPos, p->GetBodySize());
 
 				peace.push_back(p);
 			}
@@ -661,6 +686,11 @@ void GameScene::StartNewPuzzle(void)
 	isClear = false;
 	clearWaitFrame = 0;
 
+	if (LoadRandomStageFile() == false)
+	{
+		return;
+	}
+
 	if (stageList.empty())
 	{
 		return;
@@ -672,16 +702,20 @@ void GameScene::StartNewPuzzle(void)
 
 	CreateStageFromText(stageList[index].text);
 
-	// 外に出すピース数
-	MoveRandomPiecesOutside(2);
-
-	// 問題開始時間を記録
-	puzzleStartTimeMs = GetNowCount();
+	MoveRandomPiecesOutside(GetRand(3)+1);
 
 	lastAddScore = 0;
 	lastElapsedTime = 0.0f;
 	lastTimeBonus = 1.0f;
+
+	// PLAY中の次問生成時だけ、問題タイマーを開始
+	if (gamePhase == GAME_PHASE::PLAY)
+	{
+		puzzleStartTimeMs = GetNowCount();
+	}
 }
+
+
 
 bool GameScene::LoadStageFile(const std::string& filePath)
 {
@@ -813,9 +847,13 @@ float GameScene::GetRemainingTime(void) const
 
 bool GameScene::IsTimeUp(void) const
 {
+	if (gamePhase != GAME_PHASE::PLAY)
+	{
+		return false;
+	}
+
 	return GetRemainingTime() <= 0.0f;
 }
-
 
 bool GameScene::ParseStageCell(const std::string& cell, int& type, int& dir)
 {
@@ -829,7 +867,7 @@ bool GameScene::ParseStageCell(const std::string& cell, int& type, int& dir)
 		return false;
 	}
 
-	// [2]7 のような形式
+	// []で囲んだ数をみる
 	if (cell[0] == '[')
 	{
 		size_t closePos = cell.find(']');
@@ -901,4 +939,161 @@ bool GameScene::IsSameShapeDir(int type, int dirA, int dirB)
 	default:
 		return dirA == dirB;
 	}
+}
+
+void GameScene::UpdateStartSequence(void)
+{
+	startCountFrame++;
+
+	if (gamePhase == GAME_PHASE::READY)
+	{
+		if (startCountFrame >= readyDisplayFrame)
+		{
+			gamePhase = GAME_PHASE::GO;
+			startCountFrame = 0;
+		}
+	}
+	else if (gamePhase == GAME_PHASE::GO)
+	{
+		if (startCountFrame >= goDisplayFrame)
+		{
+			BeginPlay();
+		}
+	}
+}
+
+void GameScene::BeginPlay(void)
+{
+	gamePhase = GAME_PHASE::PLAY;
+	startCountFrame = 0;
+
+	// ゲーム全体の制限時間開始
+	gameStartTimeMs = GetNowCount();
+
+	// 現在の問題のタイムボーナス用タイマー開始
+	puzzleStartTimeMs = GetNowCount();
+}
+
+void GameScene::DrawStartSequence(void)
+{
+	if (gamePhase == GAME_PHASE::PLAY)
+	{
+		return;
+	}
+
+	int img = -1;
+
+	if (gamePhase == GAME_PHASE::READY)
+	{
+		img = readyImg;
+	}
+	else if (gamePhase == GAME_PHASE::GO)
+	{
+		img = goImg;
+	}
+
+	if (img == -1)
+	{
+		return;
+	}
+
+	int w = 0;
+	int h = 0;
+	GetGraphSize(img, &w, &h);
+
+	int x = 1920 / 2 - w / 2;
+	int y = 1080 / 2 - h / 2;
+
+	DrawGraph(x, y, img, true);
+}
+
+void GameScene::ResetGuideFrame(void)
+{
+	hasGuideFrame = false;
+
+	guideLeft = 0.0f;
+	guideTop = 0.0f;
+	guideRight = 0.0f;
+	guideBottom = 0.0f;
+}
+
+void GameScene::AddGuideFrameRect(const Vector2F& pos, const Vector2& size)
+{
+	float left = pos.x;
+	float top = pos.y;
+	float right = pos.x + size.x;
+	float bottom = pos.y + size.y;
+
+	if (!hasGuideFrame)
+	{
+		guideLeft = left;
+		guideTop = top;
+		guideRight = right;
+		guideBottom = bottom;
+
+		hasGuideFrame = true;
+		return;
+	}
+
+	if (left < guideLeft) guideLeft = left;
+	if (top < guideTop) guideTop = top;
+	if (right > guideRight) guideRight = right;
+	if (bottom > guideBottom) guideBottom = bottom;
+}
+
+void GameScene::DrawGuideFrame(void)
+{
+	if (!hasGuideFrame)
+	{
+		return;
+	}
+
+	int margin = 8;
+	int thickness = 6; // 線の太さ
+	int color = GetColor(255, 0, 0);
+
+	int left = (int)guideLeft - margin;
+	int top = (int)guideTop - margin;
+	int right = (int)guideRight + margin;
+	int bottom = (int)guideBottom + margin;
+
+	// 上
+	DrawBox(
+		left,
+		top,
+		right,
+		top + thickness,
+		color,
+		true
+	);
+
+	// 下
+	DrawBox(
+		left,
+		bottom - thickness,
+		right,
+		bottom,
+		color,
+		true
+	);
+
+	// 左
+	DrawBox(
+		left,
+		top,
+		left + thickness,
+		bottom,
+		color,
+		true
+	);
+
+	// 右
+	DrawBox(
+		right - thickness,
+		top,
+		right,
+		bottom,
+		color,
+		true
+	);
 }

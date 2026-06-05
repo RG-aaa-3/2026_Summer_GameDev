@@ -357,3 +357,41 @@ void PeaceBase::SetBodyPos(const Vector2F& bodyPos)
 	peacePos.x = bodyPos.x - offset.x;
 	peacePos.y = bodyPos.y - offset.y;
 }
+
+
+Vector2 PeaceBase::GetBodySize(void) const
+{
+	std::vector<std::vector<int>> rotated = GetRotatedCanvasShape();
+
+	int minX = 999;
+	int minY = 999;
+	int maxX = -1;
+	int maxY = -1;
+
+	for (int y = 0; y < rotated.size(); y++)
+	{
+		for (int x = 0; x < rotated[y].size(); x++)
+		{
+			if (rotated[y][x] == 0) continue;
+
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+		}
+	}
+
+	Vector2 bodySize;
+
+	if (maxX == -1 || maxY == -1)
+	{
+		bodySize.x = 0;
+		bodySize.y = 0;
+		return bodySize;
+	}
+
+	bodySize.x = (maxX - minX + 1) * cellSize;
+	bodySize.y = (maxY - minY + 1) * cellSize;
+
+	return bodySize;
+}

@@ -23,7 +23,8 @@ bool cursor::SystemInit(void) {
 
 void cursor::GameInit(void) {
 
-
+	pos.x = SceneManager::SCREEN_SIZE_WID / 2;
+	pos.y = SceneManager::SCREEN_SIZE_HIG / 2;
 
 	canhold= false;
 }

@@ -24,3 +24,27 @@ enum E_FADE_STAT_ID {
 
 	E_STAT_FADE_MAX,
 };
+
+
+//ゲームモード選択
+
+enum E_GAME_MODE_ID {
+	E_MODE_NON = -1,
+	E_MODE_BASIC,
+	E_MODE_ARENA,
+
+	E_MODE_MAX,
+};
+
+
+
+//ゲーム難易度
+
+enum E_GAME_DIFF_ID {
+	E_DIFF_NON = -1,
+	E_DIFF_EASY,
+	E_DIFF_HARD,
+	E_DIFF_MASTER,
+
+	E_DIFF_MAX,
+};

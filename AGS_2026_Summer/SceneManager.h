@@ -5,6 +5,7 @@ class GameScene;
 class Fader;
 class Result;
 class TitleScene;
+class ModeSelect;
 
 
 class SceneManager
@@ -30,6 +31,7 @@ private:
 	Fader* fader;
 	Result* rs;
 	TitleScene* title;
+	ModeSelect* mode;
 
 	void Update(void);
 	void Draw(void);
@@ -44,6 +46,8 @@ private:
 	void ReleaseScene(E_SCENE_ID id);
 
 	int resultScore = 0;
+
+	int resultBorderPoint = 0;
 
 };
 

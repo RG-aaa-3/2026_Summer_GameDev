@@ -4,14 +4,14 @@
 #include "Fader.h"
 #include "Result.h"
 #include "SceneTitle.h"
-
+#include "ModeSelect.h"
 
 SceneManager::SceneManager(void) {
 	gs = nullptr;
 	fader = nullptr;
 	rs = nullptr;
 	title = nullptr;
-
+	mode = nullptr;
 
 	scene_ID = waitScene = E_SCENE_NON;
 
@@ -33,7 +33,7 @@ void SceneManager::Run(void) {
 
 bool SceneManager::SystemInit(void) {
 	// システム処理
-	SetWindowText("2516001 有迫　勇智");						// ゲームウィンドウのタイトル
+	SetWindowText("Pazzle Arena");						// ゲームウィンドウのタイトル
 	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);		// ゲームウィンドウのサイズと色モードを設定
 	ChangeWindowMode(false);									// ゲームウィンドウの表示方法(false = フルスクリーン)
 
@@ -93,6 +93,10 @@ void SceneManager::Update(void)
 		break;
 
 	case E_SCENE_MODE:
+		if (mode != nullptr) {
+			mode->Update();
+			nextSceneID = mode->GetNextSceneID();
+		}
 		break;
 
 	case E_SCENE_GAME:
@@ -114,6 +118,14 @@ void SceneManager::Update(void)
 
 	if (scene_ID != nextSceneID) {
 
+		// モード選択からゲームへ行く直前にボーダーを保存
+		if (scene_ID == E_SCENE_MODE && nextSceneID == E_SCENE_GAME) {
+			if (mode != nullptr) {
+				resultBorderPoint = mode->GetBorderPoint();
+			}
+		}
+
+		// ゲームからリザルトへ行く直前にスコアを保存
 		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT) {
 			if (gs != nullptr) {
 				resultScore = gs->GetScore();
@@ -140,7 +152,7 @@ void SceneManager::Draw(void) {
 		break;
 
 	case E_SCENE_MODE:
-
+		mode->Draw();
 		break;
 
 	case E_SCENE_GAME:
@@ -198,6 +210,12 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_MODE:
+		if (mode == nullptr) {
+			mode = new ModeSelect();
+			if (mode == nullptr)return false;
+			mode->SystemInit();
+			mode->GameInit();
+		}
 
 		break;
 
@@ -217,8 +235,9 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 			if (rs == nullptr) return false;
 
 			rs->SystemInit();
-			rs->SetScore(resultScore);
+			rs->SetResultData(resultScore, resultBorderPoint);
 			rs->GameInit();
+
 		}
 
 		break;
@@ -244,7 +263,11 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_MODE:
-
+		if (mode != nullptr) {
+			mode->Release();
+			delete mode;
+			mode = nullptr;
+		}
 		break;
 
 	case E_SCENE_GAME:

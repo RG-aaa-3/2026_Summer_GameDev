@@ -4,6 +4,7 @@
 
 
 class GameScene;
+class ModeSelect;
 
 class Result
 {
@@ -22,12 +23,17 @@ public:
 
 	void HighScoreUpdate(void);
 
+	void IsBorderCleard(void);
+
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
+
+	void SetBorderPoint(int border) { borderPoint = border; }
 
 	void SetScore(int score);
 
+	void SetResultData(int score, int border);
 private:
-
+	ModeSelect* mode;
 
 	E_SCENE_ID nextSceneID;
 	int prevNextKey, nowNextKey;
@@ -38,6 +44,9 @@ private:
 	int fourcescore;
 	int myscore;
 	int prevscore;
+
+	bool clear;
+	int borderPoint = 0;
 
 	bool LoadHighScoreFile(void);
 	bool SaveHighScoreFile(void);
