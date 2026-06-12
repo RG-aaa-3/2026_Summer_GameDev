@@ -22,7 +22,7 @@ SceneManager::~SceneManager(void) {
 }
 
 void SceneManager::Run(void) {
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0){
+	while (ProcessMessage() == 0 && GameQuit==false){
 
 	Update();
 	Draw();
@@ -83,6 +83,14 @@ void SceneManager::Update(void)
 	// ここから通常時のシーン更新
 	E_SCENE_ID nextSceneID = scene_ID;
 
+	//ゲーム終了判定
+	if (nextSceneID == E_SCENE_QUIT)
+	{
+		GameQuit = true;
+		return;
+	}
+
+
 	switch (scene_ID)
 	{
 	case E_SCENE_TITLE:
@@ -114,20 +122,25 @@ void SceneManager::Update(void)
 			nextSceneID = rs->GetNextSceneID();
 		}
 		break;
+
+
 	}
 
-	if (scene_ID != nextSceneID) {
-
-		// モード選択からゲームへ行く直前にボーダーを保存
-		if (scene_ID == E_SCENE_MODE && nextSceneID == E_SCENE_GAME) {
-			if (mode != nullptr) {
+	if (scene_ID != nextSceneID)
+	{
+		if (scene_ID == E_SCENE_MODE && nextSceneID == E_SCENE_GAME)
+		{
+			if (mode != nullptr)
+			{
+				selectedModeId = mode->GetModeId();
 				resultBorderPoint = mode->GetBorderPoint();
 			}
 		}
 
-		// ゲームからリザルトへ行く直前にスコアを保存
-		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT) {
-			if (gs != nullptr) {
+		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT)
+		{
+			if (gs != nullptr)
+			{
 				resultScore = gs->GetScore();
 			}
 		}
@@ -220,12 +233,15 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_GAME:
-		if (gs == nullptr) {
+		if (gs == nullptr)
+		{
 			gs = new GameScene();
-			if (gs == nullptr)return false;
-			gs->SystemInit();
-			gs->GameInit();
+			if (gs == nullptr) return false;
 
+			gs->SetModeId(selectedModeId);
+
+			if (gs->SystemInit() == false) return false;
+			gs->GameInit();
 		}
 		break;
 
@@ -288,5 +304,12 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 
 	}
 
+
+}
+
+
+void SceneManager::GameEnd() {
+
+	GameQuit = true;
 
 }

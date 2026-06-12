@@ -8,6 +8,9 @@ ModeSelect::ModeSelect() {
 	lv1img = -1;
 	lv2img = -1;
 	lv3img = -1;
+	haikei = -1;
+	yesimg = -1;
+	noimg = -1;
 
 }
 
@@ -25,9 +28,13 @@ bool ModeSelect::SystemInit(void) {
 	lv2img = LoadGraph("image/GameLevel_Lv2.png");
 	lv3img = LoadGraph("image/GameLevel_Lv3.png");
 
+	yesimg = LoadGraph("Screen/Yes.png");
+	noimg = LoadGraph("Screen/No.png");
+
 	haikei = LoadGraph("Screen/haikei.png");
 	if (haikei == -1)	return false;
 
+	if (yesimg == -1 || noimg == -1)return false;
 
 	if (lv1img == -1 || lv2img == -1 || lv3img == -1)return false;
 
@@ -52,11 +59,18 @@ void ModeSelect::GameInit(void) {
 
 void ModeSelect::Update(void) {
 
-	Input();
+	if (Quitkakunin == false) Input();
+
+
+	if (Quitkakunin)GameQuitkakunin();
+
 
 }
 
 void ModeSelect::Draw(void) {
+
+	if(Quitkakunin==false)SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
 
 
@@ -64,6 +78,15 @@ void ModeSelect::Draw(void) {
 	ChangeDiffPicture();
 	ChangeModePicture();
 	BoarderTextUpdate();
+
+
+	DrawFormatString(0, 1000, GetColor(255, 255, 255), "ゲームをやめる[Esc]");
+
+	
+	
+	if (Quitkakunin)GameQuitkakuninDraw();
+
+
 
 }
 
@@ -106,10 +129,10 @@ void ModeSelect::ChangeModePicture() {
 
 	switch (modeId) {
 	case E_MODE_BASIC:
-		DrawFormatString(x, y, GetColor(0, 0, 0), "B");
+		DrawFormatString(x-80, y, GetColor(0, 0, 0), "BASIC");
 		break;
 	case E_MODE_ARENA:
-		DrawFormatString(x, y, GetColor(0, 0, 0), "A");
+		DrawFormatString(x-80, y, GetColor(255, 0, 0), "まだないよ");
 		break;
 
 	}
@@ -118,6 +141,10 @@ void ModeSelect::ChangeModePicture() {
 
 
 void ModeSelect::Input() {
+
+	if (CheckHitKey(KEY_INPUT_ESCAPE))Quitkakunin = true;
+
+
 
 		nowKeyInputL = CheckHitKey(KEY_INPUT_LEFT);
 
@@ -128,8 +155,7 @@ void ModeSelect::Input() {
 		nowKeyInputD = CheckHitKey(KEY_INPUT_DOWN);
 	
 		nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
-
-
+	
 
 	//左右操作でモード切替、上下操作で難易度変更
 	if (nowKeyInputL==0&&prevKeyInputL==1) {
@@ -145,7 +171,7 @@ void ModeSelect::Input() {
 		diffId = (enum E_GAME_DIFF_ID)((int)diffId - 1);
 	}
 
-	if (nowSpaceKey == 0 && prevSpaceKey == 1) {
+	if (nowSpaceKey == 1 && prevSpaceKey == 0) {
 		SubmitGame();
 	}
 
@@ -163,6 +189,7 @@ void ModeSelect::Input() {
 	prevKeyInputU = nowKeyInputU;
 	prevKeyInputD = nowKeyInputD;
 	prevSpaceKey = nowSpaceKey;
+
 
 }
 
@@ -211,10 +238,7 @@ void ModeSelect::SubmitGame(void){
 	SetFontSize(48);
 	switch (modeId) {
 	case E_MODE_ARENA:
-		Texttime = 400;
-		if (Texttime > 0) {
-			DrawFormatString(x, y, GetColor(0, 0, 0), "まだないよ");
-		}
+		nextSceneID = E_SCENE_GAME;
 		break;
 	case E_MODE_BASIC:
 		nextSceneID = E_SCENE_GAME;
@@ -222,4 +246,63 @@ void ModeSelect::SubmitGame(void){
 		break;
 	}
 	Texttime--;
+}
+
+
+void ModeSelect::GameQuitkakunin() {
+	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+
+
+
+	if (CheckHitKey(KEY_INPUT_RIGHT))imgtrg = 2;
+	if (CheckHitKey(KEY_INPUT_LEFT))imgtrg = 1;
+
+
+
+
+
+
+
+	prevSpaceKey = nowSpaceKey;
+
+}
+
+void ModeSelect::GameQuitkakuninDraw() {
+
+	// 背景を少し暗くする
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+
+	DrawBox(
+		0,
+		0,
+		1920,
+		1080,
+		GetColor(0, 0, 0),
+		true
+	);
+
+	DrawFormatString(SceneManager::SCREEN_SIZE_WID / 3, SceneManager::SCREEN_SIZE_HIG / 4,
+		GetColor(255, 255, 255), "ゲームを終了しますか？");
+
+	switch (imgtrg) {
+	case 1:			//Yesにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, yesimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
+
+
+		if (CheckHitKey(KEY_INPUT_SPACE))nextSceneID = E_SCENE_QUIT;
+
+
+		break;
+	case 2:			//Noにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, noimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, yesimg, true);
+
+		if (CheckHitKey(KEY_INPUT_SPACE))Quitkakunin = false;
+
+		break;
+	}
+
+
+
 }

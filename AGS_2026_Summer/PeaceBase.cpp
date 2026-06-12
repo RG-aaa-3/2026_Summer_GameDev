@@ -62,7 +62,8 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 	 const Vector2F& cursorPos,
 	 bool holdButton,
 	 bool rotateLeftButton,
-	 bool rotateRightButton
+	 bool rotateRightButton,
+	 bool canStartHold
  )
  {
 	 releasedThisFrame = false;
@@ -82,7 +83,7 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 	 }
 
 	 // 掴み始め
-	 if (triggerHold && !isHolding)
+	 if (triggerHold && !isHolding && canStartHold)
 	 {
 		 if (IsCursorOnPiece(cursorPos))
 		 {
@@ -162,8 +163,8 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 		 peace_img[0],
 		 true
 	 );
-#if 0
-	 // デバッグ赤枠
+
+	 // デバッグ赤枠(ピースの画像外枠)
 	 DrawBox(
 		 (int)peacePos.x,
 		 (int)peacePos.y,
@@ -172,23 +173,41 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 		 GetColor(255, 0, 0),
 		 false
 	 );
-#endif
+
  }
 
  bool PeaceBase::IsCursorOnPiece(const Vector2F& cursorPos)
  {
-	 Vector2 drawSize = GetDrawSize();
+	 // 4x4画像キャンバス左上から見たカーソル位置
+	 float localX = cursorPos.x - peacePos.x;
+	 float localY = cursorPos.y - peacePos.y;
 
-	 float left = peacePos.x;
-	 float top = peacePos.y;
-	 float right = peacePos.x + drawSize.x;
-	 float bottom = peacePos.y + drawSize.y;
+	 if (localX < 0.0f || localY < 0.0f)
+	 {
+		 return false;
+	 }
 
-	 return
-		 cursorPos.x >= left &&
-		 cursorPos.x <= right &&
-		 cursorPos.y >= top &&
-		 cursorPos.y <= bottom;
+	 int col = (int)(localX / cellSize);
+	 int row = (int)(localY / cellSize);
+
+	 //ピースの形のデータを取得
+	 std::vector<std::vector<int>> rotatedShape = GetRotatedCanvasShape();
+
+
+	 //データの値が0なら掴めない。1ならつかめる
+
+
+	 if (row < 0 || row >= rotatedShape.size())
+	 {
+		 return false;
+	 }
+
+	 if (col < 0 || col >= rotatedShape[row].size())
+	 {
+		 return false;
+	 }
+
+	 return rotatedShape[row][col] == 1;
  }
 
 Vector2 PeaceBase::GetCurrentPeaceSize(void) const

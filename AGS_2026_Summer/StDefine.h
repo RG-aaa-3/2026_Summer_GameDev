@@ -4,12 +4,15 @@
 //--------------------
 //列挙型定義
 //---------------------
+
+//シーン状態
 enum E_SCENE_ID {
 	E_SCENE_NON = -1,
 	E_SCENE_TITLE,		//タイトル画面
 	E_SCENE_MODE,		//ゲームモード選択
 	E_SCENE_GAME,		//ゲームプレイ画面
 	E_SCENE_RESULT,		//リザルト画面
+	E_SCENE_QUIT,		//ゲーム終了フラグ
 
 	E_SCENE_ID_MAX,
 };

@@ -45,6 +45,40 @@ class GameScene
 
 	int GetScore(void) { return totalScore; }
 
+	void SetModeId(E_GAME_MODE_ID id) { modeId = id; }
+
+
+	//アリーナ用
+	void DrawGauge(
+		int x,
+		int y,
+		int width,
+		int height,
+		float value,
+		float maxValue
+	);
+
+	float Hp;
+	float Maxhp = 12800;
+	float attackDamage;
+
+	float EnemyHp = 100;
+	float nowEnemyHp = 100;
+	float EnemyBoost = 1.2;
+
+	
+
+	//まとめ用
+	void BaseUpdate(void);
+
+	void BaseDraw(void);
+	void BasicDraw(void);
+
+
+	void ArenaUpdate(void);
+	void ArenaDraw(void);
+
+
 private:
 
 
@@ -73,7 +107,7 @@ private:
 
 	int startCountFrame = 0;
 
-	// 後から変更しやすい表示時間
+	// 表示時間
 	int readyDisplayFrame = 40; // 60フレーム = 約1秒
 	int goDisplayFrame = 50;
 
@@ -109,7 +143,7 @@ private:
 	static constexpr int CLEAR_WAIT_FRAME = 60; // 60フレーム待って次の問題へ
 	int clearWaitFrame = 0;
 
-	static constexpr int TIME_UP_WAIT_FRAME = 180;
+	static constexpr int TIME_UP_WAIT_FRAME = 180;//タイムアップ
 	int timeupWaitFrame = 0;
 
 
@@ -122,6 +156,8 @@ private:
 	//スコア
 	int totalScore = 0;
 	int lastAddScore = 0;
+
+	int ArenaFloor = 1;
 
 	int currentDifficultyBonus = 10;
 
@@ -161,6 +197,11 @@ private:
 	void ResetGuideFrame(void);
 	void AddGuideFrameRect(const Vector2F& pos, const Vector2& size);
 	void DrawGuideFrame(void);
+
+	E_GAME_MODE_ID modeId;
+
+	bool ClearStop = false;
+	
 
 };
 

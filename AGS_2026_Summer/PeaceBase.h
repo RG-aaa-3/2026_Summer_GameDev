@@ -40,11 +40,12 @@ public:
 	virtual bool SystemInit(GameScene* gs);			//初期化処理(最初の1回のみ実行)
 	virtual void GameInit(void);			//ゲーム起動・再開時に必ず呼び出す処理
 	virtual void Update(
-						const Vector2F& cursorPos,
-						bool holdButton,
-						bool rotateLeftButton,
-						bool rotateRightButton
-									);				//更新処理
+		const Vector2F& cursorPos,
+		bool holdButton,
+		bool rotateLeftButton,
+		bool rotateRightButton,
+		bool canStartHold
+	);									//更新処理
 	virtual void Draw(void);				//描画処理
 	//virtual bool Release(void);				//解放処理(最後の１回のみ実行)
 

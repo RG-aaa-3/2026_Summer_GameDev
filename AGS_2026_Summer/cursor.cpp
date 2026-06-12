@@ -1,6 +1,8 @@
 #include "cursor.h"
 #include <DxLib.h>
 #include "SceneManager.h"
+#include "InputManager.h"
+
 
 cursor::~cursor(void) {
 	img = -1;
@@ -49,17 +51,25 @@ bool cursor::Release(void) {
 
 
 void cursor::Cursormove(void) {
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+	int analogKeyY = state.AKeyLY;
+
 	//à⁄ìÆ(è„â∫ç∂âEÉLÅ[)
-	if (CheckHitKey(KEY_INPUT_LEFT)) {
+	if (CheckHitKey(KEY_INPUT_LEFT)||analogKeyX<0) {
 		pos.x -= CURSOR_MOVE_SPEED_X;
 	}
-	if (CheckHitKey(KEY_INPUT_RIGHT)) {
+	if (CheckHitKey(KEY_INPUT_RIGHT)||analogKeyX>0) {
 		pos.x += CURSOR_MOVE_SPEED_X;
 	}
-	if (CheckHitKey(KEY_INPUT_UP)) {
+	if (CheckHitKey(KEY_INPUT_UP)||analogKeyY<0) {
 		pos.y -= CURSOR_MOVE_SPEED_Y;
 	}
-	if (CheckHitKey(KEY_INPUT_DOWN)) {
+	if (CheckHitKey(KEY_INPUT_DOWN)||analogKeyY>0) {
 		pos.y += CURSOR_MOVE_SPEED_Y;
 	}
 
