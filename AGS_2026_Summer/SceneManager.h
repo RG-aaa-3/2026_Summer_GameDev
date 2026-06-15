@@ -49,6 +49,9 @@ private:
 
 	int resultBorderPoint = 0;
 
+	int resultArenaFloor = 0;
+	E_GAME_MODE_ID resultModeId = E_MODE_BASIC;
+
 
 	//ゲーム終了フラグ
 	bool GameQuit = false;

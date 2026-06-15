@@ -5,6 +5,7 @@
 #include "Result.h"
 #include "SceneTitle.h"
 #include "ModeSelect.h"
+#include "InputManager.h"
 
 SceneManager::SceneManager(void) {
 	gs = nullptr;
@@ -63,6 +64,8 @@ bool SceneManager::SystemInit(void) {
 
 void SceneManager::Update(void)
 {
+	InputManager::GetInstance().Update();
+
 	fader->Update();
 
 	// フェードアウトが終わったら、待機中のシーンへ切り替え
@@ -142,6 +145,8 @@ void SceneManager::Update(void)
 			if (gs != nullptr)
 			{
 				resultScore = gs->GetScore();
+				resultArenaFloor = gs->GetArenaFloor();
+				resultModeId = gs->GetModeId();
 			}
 		}
 
@@ -246,18 +251,23 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_RESULT:
-		if (rs == nullptr) {
+		if (rs == nullptr)
+		{
 			rs = new Result();
 			if (rs == nullptr) return false;
 
 			rs->SystemInit();
-			rs->SetResultData(resultScore, resultBorderPoint);
+
+			rs->SetResultData(
+				resultScore,
+				resultBorderPoint,
+				resultModeId,
+				resultArenaFloor
+			);
+
 			rs->GameInit();
-
 		}
-
 		break;
-
 	}
 	return true;
 }

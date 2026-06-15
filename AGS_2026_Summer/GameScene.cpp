@@ -639,6 +639,8 @@ void GameScene::StartNewPuzzle(void)
 
 	CreateStageFromText(stageList[index].text);
 
+
+	//ここで難易度ごとに外す数変える
 	MoveRandomPiecesOutside(GetRand(3)+1);
 
 	lastAddScore = 0;
@@ -1040,8 +1042,6 @@ void GameScene::DrawGuideFrame(void)
 
 void GameScene::BaseUpdate() {
 
-	//ゲーム強制終了(Esc)
-	if (CheckHitKey(KEY_INPUT_ESCAPE))nextSceneID = E_SCENE_MODE;
 
 
 
@@ -1133,12 +1133,26 @@ void GameScene::BaseUpdate() {
 		clearWaitFrame = 0;
 	}
 
+	CountReset--;
+	if (CountReset <= 0) {
+		EscapeCount = 0;
+		CountReset = 1000.0f;
+	}
+
+	prevEscapeButton = nowEscapeButton;
+
+	nowEscapeButton = inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT);
+
+	if(prevEscapeButton&&!nowEscapeButton)EscapeCount++;
+
+	//ゲーム強制終了(Esc or X5回)
+	if (CheckHitKey(KEY_INPUT_ESCAPE)||EscapeCount>=5)nextSceneID = E_SCENE_MODE;
+
 
 }
 
 
 void GameScene::BaseDraw() {
-
 
 
 	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
@@ -1192,6 +1206,16 @@ void GameScene::BaseDraw() {
 
 
 	DrawFormatString(0, 1000, GetColor(255, 255, 255), "モード選択に戻る[Esc]");
+
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+
+
+	//デバッグ用確認テキスト------------------------------
+	//DrawFormatString(20, 880, GetColor(255, 255, 255),
+	//"EscapeCount:%d", EscapeCount);
+
 }
 
 
@@ -1337,7 +1361,8 @@ void GameScene::ArenaUpdate() {
 
 	if (Hp <= 0) {
 
-
+		nextSceneID = E_SCENE_RESULT;
+		return;
 
 	}
 

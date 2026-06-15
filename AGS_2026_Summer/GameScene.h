@@ -66,6 +66,8 @@ class GameScene
 	float nowEnemyHp = 100;
 	float EnemyBoost = 1.2;
 
+	int GetArenaFloor(void) const { return ArenaFloor; }
+	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
 	
 
 	//まとめ用
@@ -175,7 +177,7 @@ private:
 
 	int gameStartTimeMs = 0;
 
-	static constexpr float GAME_LIMIT_TIME = 60.0f; // 制限時間 60秒
+	static constexpr float GAME_LIMIT_TIME = 30.0f; // 制限時間 60秒
 
 	float GetGameElapsedTime(void) const;
 	float GetRemainingTime(void) const;
@@ -202,6 +204,11 @@ private:
 
 	bool ClearStop = false;
 	
+
+	bool nowEscapeButton, prevEscapeButton = false;
+
+	int EscapeCount = 0;
+	float CountReset = 1000.0f;//リセットまでのカウント
 
 };
 

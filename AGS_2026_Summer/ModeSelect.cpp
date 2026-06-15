@@ -1,6 +1,7 @@
 #include "ModeSelect.h"
 #include<DxLib.h>
 #include "SceneManager.h"
+#include "InputManager.h"
 
 ModeSelect::ModeSelect() {
 
@@ -142,19 +143,57 @@ void ModeSelect::ChangeModePicture() {
 
 void ModeSelect::Input() {
 
+
+	nowKeyInputD = nowKeyInputL = nowKeyInputR = nowKeyInputU = nowSpaceKey = 0;
+
+
+
 	if (CheckHitKey(KEY_INPUT_ESCAPE))Quitkakunin = true;
 
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+	int analogKeyY = state.AKeyLY;
 
 
-		nowKeyInputL = CheckHitKey(KEY_INPUT_LEFT);
 
-		nowKeyInputR = CheckHitKey(KEY_INPUT_RIGHT);
+	//上下左右
+	if (analogKeyX < 0 || CheckHitKey(KEY_INPUT_RIGHT)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 0;
+		nowKeyInputR = 1;
+		nowKeyInputL = 0;
+	}
+	if (analogKeyX > 0 ||CheckHitKey(KEY_INPUT_LEFT)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 0;
+		nowKeyInputR = 0;
+		nowKeyInputL = 1;
+	}
+	if (analogKeyY < 0 ||CheckHitKey(KEY_INPUT_UP)) {
+		nowKeyInputU = 1;
+		nowKeyInputD = 0;
+		nowKeyInputR = 0;
+		nowKeyInputL = 0;
+	}
+	if (analogKeyY > 0 ||CheckHitKey(KEY_INPUT_DOWN)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 1;
+		nowKeyInputR = 0;
+		nowKeyInputL = 0;
 
-		nowKeyInputU = CheckHitKey(KEY_INPUT_UP);
+	}
 
-		nowKeyInputD = CheckHitKey(KEY_INPUT_DOWN);
+
+
 	
-		nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+	if (inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT) || CheckHitKey(KEY_INPUT_SPACE))
+		nowSpaceKey = 1;
+	
+
+
 	
 
 	//左右操作でモード切替、上下操作で難易度変更
@@ -170,6 +209,9 @@ void ModeSelect::Input() {
 	if (nowKeyInputD == 0 && prevKeyInputD == 1) {
 		diffId = (enum E_GAME_DIFF_ID)((int)diffId - 1);
 	}
+
+	
+
 
 	if (nowSpaceKey == 1 && prevSpaceKey == 0) {
 		SubmitGame();
@@ -256,12 +298,6 @@ void ModeSelect::GameQuitkakunin() {
 
 	if (CheckHitKey(KEY_INPUT_RIGHT))imgtrg = 2;
 	if (CheckHitKey(KEY_INPUT_LEFT))imgtrg = 1;
-
-
-
-
-
-
 
 	prevSpaceKey = nowSpaceKey;
 

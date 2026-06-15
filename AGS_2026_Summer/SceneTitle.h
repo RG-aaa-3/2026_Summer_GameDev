@@ -21,6 +21,8 @@ public:
 
 
 private:
+	
+	bool nowRightButton, prevRightButton = false;
 
 
 	E_SCENE_ID nextSceneID;

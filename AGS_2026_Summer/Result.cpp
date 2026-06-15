@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "ModeSelect.h"
 #include "SceneManager.h"
-
+#include <functional>
 
 
 
@@ -72,8 +72,9 @@ result = LoadGraph("Screen/Result.png");
 if (result == -1)return false;
 
 
+LoadHighScoreFile();
+LoadArenaFloorFile();
 
- LoadHighScoreFile();
 
  return true;
 
@@ -138,6 +139,55 @@ nextSceneID = E_SCENE_TITLE;
 
 
 void Result::Draw() {
+
+
+
+	if (resultModeId == E_MODE_ARENA)
+	{
+		DrawFormatString(
+			240,
+			80,
+			GetColor(255, 255, 0),
+			"1st : %d F",
+			firstFloor
+		);
+
+		DrawFormatString(
+			240,
+			160,
+			GetColor(200, 200, 200),
+			"2nd : %d F",
+			secondFloor
+		);
+
+		DrawFormatString(
+			240,
+			240,
+			GetColor(204, 102, 0),
+			"3rd : %d F",
+			thirdFloor
+		);
+
+		DrawFormatString(
+			240,
+			320,
+			GetColor(0, 180, 0),
+			"4th : %d F",
+			fourthFloor
+		);
+
+		DrawFormatString(
+			240,
+			460,
+			GetColor(255, 255, 255),
+			"YOU : %d F",
+			arenaFloor
+		);
+
+
+		return;
+	}
+
 
 	int p = borderPoint;
 
@@ -219,21 +269,28 @@ void Result::HighScoreUpdate()
 
 
 
-void Result::SetResultData(int score, int border)
-
+void Result::SetResultData(
+	int score,
+	int border,
+	E_GAME_MODE_ID mode,
+	int floor
+)
 {
-
 	myscore = score;
-
 	borderPoint = border;
+	resultModeId = mode;
+	arenaFloor = floor;
 
-
-
-	HighScoreUpdate();
-	IsBorderCleard();
-
+	if (resultModeId == E_MODE_ARENA)
+	{
+		ArenaFloorRankUpdate();
+	}
+	else
+	{
+		HighScoreUpdate();
+		IsBorderCleard();
+	}
 }
-
 
 
 bool Result::LoadHighScoreFile(void)
@@ -324,3 +381,64 @@ void Result::IsBorderCleard(void) {
 
 }
 
+bool Result::LoadArenaFloorFile(void)
+{
+	std::ifstream file("data/arenafloor.txt");
+
+	if (!file.is_open())
+	{
+		firstFloor = 0;
+		secondFloor = 0;
+		thirdFloor = 0;
+		fourthFloor = 0;
+		return false;
+	}
+
+	file >> firstFloor;
+	file >> secondFloor;
+	file >> thirdFloor;
+	file >> fourthFloor;
+
+	file.close();
+
+	return true;
+}
+
+bool Result::SaveArenaFloorFile(void)
+{
+	std::ofstream file("data/arenafloor.txt");
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	file << firstFloor << std::endl;
+	file << secondFloor << std::endl;
+	file << thirdFloor << std::endl;
+	file << fourthFloor << std::endl;
+
+	file.close();
+
+	return true;
+}
+
+void Result::ArenaFloorRankUpdate(void)
+{
+	std::vector<int> floors;
+
+	floors.push_back(firstFloor);
+	floors.push_back(secondFloor);
+	floors.push_back(thirdFloor);
+	floors.push_back(fourthFloor);
+	floors.push_back(arenaFloor);
+
+	std::sort(floors.begin(), floors.end(), std::greater<int>());
+
+	firstFloor = floors[0];
+	secondFloor = floors[1];
+	thirdFloor = floors[2];
+	fourthFloor = floors[3];
+
+	SaveArenaFloorFile();
+}

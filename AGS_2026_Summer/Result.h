@@ -60,7 +60,12 @@ public:
 
 
 
-	void SetResultData(int score, int border);
+	void SetResultData(
+		int score,
+		int border,
+		E_GAME_MODE_ID mode,
+		int floor
+	);
 
 	private:
 
@@ -79,7 +84,7 @@ public:
 	int prevNextKey, nowNextKey;
 
 
-
+	//スコアランキング用
 	 int firstscore;
 
 	int secondscore;
@@ -91,6 +96,20 @@ public:
 	int myscore;
 
 	int prevscore;
+
+	//アリーナ階層ランキング用
+	E_GAME_MODE_ID resultModeId = E_MODE_BASIC;
+
+	int arenaFloor = 0;
+
+	int firstFloor = 0;
+	int secondFloor = 0;
+	int thirdFloor = 0;
+	int fourthFloor = 0;
+
+	bool LoadArenaFloorFile(void);
+	bool SaveArenaFloorFile(void);
+	void ArenaFloorRankUpdate(void);
 
 
 
