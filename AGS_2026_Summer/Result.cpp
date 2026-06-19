@@ -5,9 +5,12 @@
 #include <vector>
 #include <algorithm>
 #include "ModeSelect.h"
+#include "SceneManager.h"
 
 
 Result::Result(void) {
+
+	result = -1;
 
 	firstscore = 0;
 	secondscore = 0;
@@ -33,6 +36,9 @@ Result::~Result(void) {
 }
 
 bool Result::SystemInit() {
+
+	result = LoadGraph("Screen/Result.png");
+	if (result == -1)return false;
 
 	LoadHighScoreFile();
 
@@ -72,6 +78,10 @@ void Result::Update() {
 void Result::Draw() {
 	int p = borderPoint;
 
+	DrawRotaGraph3(SceneManager::SCREEN_SIZE_WID / 2, SceneManager::SCREEN_SIZE_HIG / 2, 
+		1024 / 2, 426 / 2, 1.875, 2.5, 0, result, false);
+
+	
 
 		SetFontSize(48);
 
@@ -80,18 +90,20 @@ void Result::Draw() {
 		DrawFormatString(240, 240, GetColor(204, 102, 0), "3rd:%d", thirdscore);
 		DrawFormatString(240, 320, GetColor(0, 180, 0), "4th:%d", fourcescore);
 		DrawFormatString(240, 400, GetColor(255, 255, 255), "You:%d", myscore);
+
+		DrawFormatString(1590, 990, GetColor(255, 255, 255), "SPACE>Title");
 	
 
 		DrawFormatString(240, 500, GetColor(255, 0, 0),"BORDER:%d", p);
 		if (clear)DrawFormatString(480, 160, GetColor(255, 0, 0),"LEVEL CLEAR!!");
-		if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 255), "LEVEL FAILED...");
+		if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 0), "LEVEL FAILED...");
 
 }
 
 
 bool Result::Release() {
 
-
+	if (DeleteGraph(result) == -1)return false;
 
 	return true;
 }

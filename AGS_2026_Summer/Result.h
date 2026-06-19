@@ -5,6 +5,7 @@
 
 class GameScene;
 class ModeSelect;
+class SceneManager;
 
 class Result
 {
@@ -34,6 +35,9 @@ public:
 	void SetResultData(int score, int border);
 private:
 	ModeSelect* mode;
+
+	//リザルト画面のハンドル
+	int result;
 
 	E_SCENE_ID nextSceneID;
 	int prevNextKey, nowNextKey;

@@ -19,7 +19,46 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsoUtility.cpp" />
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="Fader.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModeSelect.cpp" />
+    <ClCompile Include="PeaceBase.cpp" />
+    <ClCompile Include="PeaceI.cpp" />
+    <ClCompile Include="PeaceJ.cpp" />
+    <ClCompile Include="PeaceL.cpp" />
+    <ClCompile Include="PeaceO.cpp" />
+    <ClCompile Include="PeaceS.cpp" />
+    <ClCompile Include="PeaceT.cpp" />
+    <ClCompile Include="PeaceZ.cpp" />
+    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector2F.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AsoUtility.h" />
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="Fader.h" />
+    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="ModeSelect.h" />
+    <ClInclude Include="PeaceBase.h" />
+    <ClInclude Include="PeaceI.h" />
+    <ClInclude Include="PeaceJ.h" />
+    <ClInclude Include="PeaceL.h" />
+    <ClInclude Include="PeaceO.h" />
+    <ClInclude Include="PeaceS.h" />
+    <ClInclude Include="PeaceT.h" />
+    <ClInclude Include="PeaceZ.h" />
+    <ClInclude Include="Result.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="StDefine.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector2F.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -46,7 +85,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -105,10 +144,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -119,10 +161,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
