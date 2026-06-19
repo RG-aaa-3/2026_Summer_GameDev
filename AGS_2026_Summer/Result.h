@@ -56,7 +56,7 @@ public:
 
 
 
-	void SetScore(int score);
+
 
 
 

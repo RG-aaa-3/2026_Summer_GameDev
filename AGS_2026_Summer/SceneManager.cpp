@@ -6,6 +6,7 @@
 #include "SceneTitle.h"
 #include "ModeSelect.h"
 #include "InputManager.h"
+#include "HowtoPlay.h"
 
 SceneManager::SceneManager(void) {
 	gs = nullptr;
@@ -13,6 +14,7 @@ SceneManager::SceneManager(void) {
 	rs = nullptr;
 	title = nullptr;
 	mode = nullptr;
+	how = nullptr;
 
 	scene_ID = waitScene = E_SCENE_NON;
 
@@ -125,7 +127,14 @@ void SceneManager::Update(void)
 			nextSceneID = rs->GetNextSceneID();
 		}
 		break;
+	case E_SCENE_HOW:
+		if (how != nullptr)
+		{
+			how->UpDate();
+			nextSceneID = how->GetNextSceneID();
 
+		}
+		break;
 
 	}
 
@@ -180,6 +189,9 @@ void SceneManager::Draw(void) {
 	case E_SCENE_RESULT:
 		rs->Draw();
 		break;
+	case E_SCENE_HOW:
+		how->Draw();
+		break;
 
 	}
 	fader->Draw();
@@ -197,6 +209,7 @@ bool SceneManager::Release(void) {
 	ReleaseScene(E_SCENE_MODE);
 	ReleaseScene(E_SCENE_GAME);
 	ReleaseScene(E_SCENE_RESULT);
+	ReleaseScene(E_SCENE_HOW);
 
 	fader->Release();
 	delete fader;
@@ -268,6 +281,17 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 			rs->GameInit();
 		}
 		break;
+	case E_SCENE_HOW:
+		if (how == nullptr)
+		{
+			how = new HowtoPlay();
+			if (how == nullptr)return false;
+			how->SystemInit();
+			how->GameInit();
+			
+		}
+		break;
+
 	}
 	return true;
 }
@@ -311,7 +335,15 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 			rs = nullptr;
 		}
 		break;
+	case E_SCENE_HOW:
+		if (how != nullptr)
+		{
+			how->Release();
+			delete how;
+			how = nullptr;
+		}
 
+		break;
 	}
 
 

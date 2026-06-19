@@ -13,6 +13,7 @@ enum E_SCENE_ID {
 	E_SCENE_GAME,		//ゲームプレイ画面
 	E_SCENE_RESULT,		//リザルト画面
 	E_SCENE_QUIT,		//ゲーム終了フラグ
+	E_SCENE_HOW,		//操作説明画面
 
 	E_SCENE_ID_MAX,
 };

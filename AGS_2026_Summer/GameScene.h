@@ -28,7 +28,7 @@ class GameScene
 	void Draw(void);				//描画処理
 	bool Release(void);				//解放処理(最後の１回のみ実行)
 
-	void CollisionCheck(void);
+
 	
 	bool IsSameShapeDir(int type, int dirA, int dirB);
 
@@ -39,13 +39,16 @@ class GameScene
 	void MoveRandomPiecesOutside(int count);
 	void CheckFitPiece(PeaceBase* p);
 
-	bool IsClear(void);		
+
 
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
 	int GetScore(void) { return totalScore; }
 
 	void SetModeId(E_GAME_MODE_ID id) { modeId = id; }
+
+	//グリッド表示
+	void DrawGuideGrid(void);
 
 
 	//アリーナ用
@@ -66,9 +69,21 @@ class GameScene
 	float nowEnemyHp = 100;
 	float EnemyBoost = 1.2;
 
+	float enemyBaseHp = 100.0f;   // 基本HP
+	float enemyMaxHp = 100.0f;    // 現在の階層での最大HP
+
+
+	float enemyBoost = 1.2f;       // 階層ごとの強化倍率
+
 	int GetArenaFloor(void) const { return ArenaFloor; }
 	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
 	
+
+	//ゲーム途中終了
+	void GameQuitkakunin();
+	void GameQuitkakuninDraw();
+
+
 
 	//まとめ用
 	void BaseUpdate(void);
@@ -110,7 +125,7 @@ private:
 	int startCountFrame = 0;
 
 	// 表示時間
-	int readyDisplayFrame = 40; // 60フレーム = 約1秒
+	int readyDisplayFrame = 60; // 60フレーム = 約1秒
 	int goDisplayFrame = 50;
 
 	void UpdateStartSequence(void);
@@ -177,7 +192,7 @@ private:
 
 	int gameStartTimeMs = 0;
 
-	static constexpr float GAME_LIMIT_TIME = 30.0f; // 制限時間 60秒
+	static constexpr float GAME_LIMIT_TIME = 60.0f; // 制限時間 60秒
 
 	float GetGameElapsedTime(void) const;
 	float GetRemainingTime(void) const;
@@ -205,10 +220,29 @@ private:
 	bool ClearStop = false;
 	
 
-	bool nowEscapeButton, prevEscapeButton = false;
+	bool nowEscapeButton= false;
 
 	int EscapeCount = 0;
 	float CountReset = 1000.0f;//リセットまでのカウント
+
+
+
+	//確認画像
+	int yesimg;
+	int noimg;
+
+	int imgtrg = 1;
+
+	//SE用ハンドル
+	int readySe;
+	int goSe;
+
+
+	bool readySePlayed;
+	bool goSePlayed;
+
+	bool Quitkakunin = false;
+	int prevSpaceKey, nowSpaceKey;
 
 };
 

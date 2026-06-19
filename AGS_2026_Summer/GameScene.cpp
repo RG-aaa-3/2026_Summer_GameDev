@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 #include "PeaceT.h"
 #include "PeaceI.h"
 #include "PeaceS.h"
@@ -17,12 +18,23 @@
 #include <string>
 #include <vector>
 #include "InputManager.h"
-
+#include "SceneManager.h"
 
 
 
 GameScene::GameScene(void) {
 	Cursor = nullptr;
+
+
+	yesimg = -1;
+	noimg = -1;
+
+
+	readySe = -1;
+	 goSe = -1;
+
+	 readySePlayed = false;
+	 goSePlayed = false;
 
 	modeId = E_MODE_BASIC;
 }
@@ -53,7 +65,25 @@ bool GameScene::SystemInit(void)
 	haikei = LoadGraph("Screen/haikei.png");
 	if (haikei == -1)	return false;
 
+
+	yesimg = LoadGraph("Screen/Yes.png");
+	noimg = LoadGraph("Screen/No.png");
+
+	if (yesimg == -1 || noimg == -1)return false;
+
+
+	readySe = LoadSoundMem("sound/ready.mp3");
+	goSe = LoadSoundMem("sound/go.mp3");
+
+	if (readySe == -1 || goSe == -1)return false;
+
+
 	Hp = Maxhp;
+
+	ArenaFloor = 1;
+
+	enemyMaxHp = enemyBaseHp;
+	nowEnemyHp = enemyMaxHp;
 
 
 	// 問題ファイル一覧
@@ -78,6 +108,7 @@ bool GameScene::SystemInit(void)
 void GameScene::GameInit(void) {
 	Cursor->GameInit();
 
+	prevSpaceKey = nowSpaceKey = 0;
 	nextSceneID = E_SCENE_GAME;
 }
 
@@ -175,6 +206,17 @@ bool GameScene::Release(void) {
 		Cursor->Release();
 		delete Cursor;
 		Cursor = nullptr;
+	}
+	if (readySe != -1)
+	{
+		DeleteSoundMem(readySe);
+		readySe = -1;
+	}
+
+	if (goSe != -1)
+	{
+		DeleteSoundMem(goSe);
+		goSe = -1;
 	}
 
 	return true;
@@ -579,6 +621,9 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 		p->SetTargetIndex(bestIndex);
 
 		fitTargets[bestIndex].occupied = true;
+
+
+		PlaySound("sound/piece_fit.mp3", DX_PLAYTYPE_BACK);
 	}
 }
 
@@ -889,6 +934,12 @@ void GameScene::UpdateStartSequence(void)
 
 	if (gamePhase == GAME_PHASE::READY)
 	{
+		if (!readySePlayed) {
+			PlaySoundMem(readySe, DX_PLAYTYPE_BACK);
+			readySePlayed = true;
+		}
+
+
 		if (startCountFrame >= readyDisplayFrame)
 		{
 			gamePhase = GAME_PHASE::GO;
@@ -897,6 +948,15 @@ void GameScene::UpdateStartSequence(void)
 	}
 	else if (gamePhase == GAME_PHASE::GO)
 	{
+
+		if (!goSePlayed) {
+			PlaySoundMem(goSe, DX_PLAYTYPE_BACK);
+			goSePlayed = true;
+
+
+		}
+
+
 		if (startCountFrame >= goDisplayFrame)
 		{
 			BeginPlay();
@@ -927,10 +987,12 @@ void GameScene::DrawStartSequence(void)
 
 	if (gamePhase == GAME_PHASE::READY)
 	{
+
 		img = readyImg;
 	}
 	else if (gamePhase == GAME_PHASE::GO)
 	{
+
 		img = goImg;
 	}
 
@@ -1040,6 +1102,49 @@ void GameScene::DrawGuideFrame(void)
 	);
 }
 
+
+void GameScene::DrawGuideGrid(void)
+{
+	if (!hasGuideFrame)
+	{
+		return;
+	}
+
+	int color = GetColor(0, 0, 0);
+
+	int left = (int)guideLeft;
+	int top = (int)guideTop;
+	int right = (int)guideRight;
+	int bottom = (int)guideBottom;
+
+	// 縦線
+	for (int x = left; x <= right; x += CELL_SIZE)
+	{
+		DrawLine(
+			x,
+			top,
+			x,
+			bottom,
+			color
+		);
+	}
+
+	// 横線
+	for (int y = top; y <= bottom; y += CELL_SIZE)
+	{
+		DrawLine(
+			left,
+			y,
+			right,
+			y,
+			color
+		);
+	}
+}
+
+
+
+
 void GameScene::BaseUpdate() {
 
 
@@ -1139,14 +1244,15 @@ void GameScene::BaseUpdate() {
 		CountReset = 1000.0f;
 	}
 
-	prevEscapeButton = nowEscapeButton;
+
 
 	nowEscapeButton = inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT);
 
-	if(prevEscapeButton&&!nowEscapeButton)EscapeCount++;
 
-	//ゲーム強制終了(Esc or X5回)
-	if (CheckHitKey(KEY_INPUT_ESCAPE)||EscapeCount>=5)nextSceneID = E_SCENE_MODE;
+
+	if (CheckHitKey(KEY_INPUT_ESCAPE)||nowEscapeButton)Quitkakunin = true;
+
+	if (Quitkakunin)GameQuitkakunin();
 
 
 }
@@ -1155,10 +1261,13 @@ void GameScene::BaseUpdate() {
 void GameScene::BaseDraw() {
 
 
+
+
+
 	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
 
 	DrawGuideFrame();
-
+	DrawGuideGrid();
 
 	for (int i = 0; i < peace.size(); i++)
 	{
@@ -1205,7 +1314,7 @@ void GameScene::BaseDraw() {
 	Cursor->Draw();
 
 
-	DrawFormatString(0, 1000, GetColor(255, 255, 255), "モード選択に戻る[Esc]");
+	DrawFormatString(0, 1000, GetColor(255, 255, 255), "モード選択に戻る[Esc]or[X]");
 
 
 	InputManager& inputIns = InputManager::GetInstance();
@@ -1216,6 +1325,8 @@ void GameScene::BaseDraw() {
 	//DrawFormatString(20, 880, GetColor(255, 255, 255),
 	//"EscapeCount:%d", EscapeCount);
 
+
+	if (Quitkakunin)GameQuitkakuninDraw();
 }
 
 
@@ -1285,10 +1396,10 @@ void GameScene::ArenaDraw() {
 
 
 	DrawGauge(0, 40, 1920, 40, Hp, Maxhp);
-	DrawFormatString(0, 40, GetColor(255, 255, 255), "You HP %f",Hp);
+	DrawFormatString(0, 40, GetColor(255, 255, 255), "You HP ");
 
 	DrawGauge(0, 0, 1920, 40, nowEnemyHp, EnemyHp);
-	DrawFormatString(0, 0, GetColor(255, 255, 255), "Enemy HP %f",nowEnemyHp);
+	DrawFormatString(0, 0, GetColor(255, 255, 255), "Enemy HP ");
 
 
 	//Ready・Goの表示
@@ -1352,8 +1463,10 @@ void GameScene::ArenaUpdate() {
 		if (nowEnemyHp <= 0) {
 
 			ArenaFloor++;
-			nowEnemyHp = EnemyHp * EnemyBoost;
 
+			enemyMaxHp = enemyBaseHp * powf(enemyBoost, ArenaFloor - 1);
+
+			nowEnemyHp = enemyMaxHp;
 		}
 
 	}
@@ -1366,6 +1479,70 @@ void GameScene::ArenaUpdate() {
 
 	}
 
+
+
+
+}
+
+
+void GameScene::GameQuitkakunin() {
+	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+
+
+	if (CheckHitKey(KEY_INPUT_RIGHT) || analogKeyX < 0)imgtrg = 2;
+	if (CheckHitKey(KEY_INPUT_LEFT) || analogKeyX > 0)imgtrg = 1;
+
+	prevSpaceKey = nowSpaceKey;
+
+}
+
+void GameScene::GameQuitkakuninDraw() {
+
+	// 背景を少し暗くする
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+
+	DrawBox(
+		0,
+		0,
+		1920,
+		1080,
+		GetColor(0, 0, 0),
+		true
+	);
+
+	SetFontSize(62);
+	DrawFormatString(SceneManager::SCREEN_SIZE_WID / 3, SceneManager::SCREEN_SIZE_HIG / 4,
+		GetColor(255, 255, 255), "モード選択にもどりますか？");
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+
+
+	switch (imgtrg) {
+	case 1:			//Yesにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, yesimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
+
+
+		if (CheckHitKey(KEY_INPUT_SPACE)|| inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))nextSceneID = E_SCENE_MODE;
+
+
+		break;
+	case 2:			//Noにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, noimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, yesimg, true);
+
+		if (CheckHitKey(KEY_INPUT_SPACE)|| inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))Quitkakunin = false;
+
+		break;
+	}
 
 
 

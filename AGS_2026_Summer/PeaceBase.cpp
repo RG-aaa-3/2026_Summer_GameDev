@@ -109,6 +109,8 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 			 {
 				 peaceDir = 3;
 			 }
+
+			 PlaySound("sound/piece_Rotate.mp3", DX_PLAYTYPE_BACK);
 		 }
 
 		 // Nで右回転
@@ -120,6 +122,7 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 			 {
 				 peaceDir = 0;
 			 }
+			 PlaySound("sound/piece_Rotate.mp3", DX_PLAYTYPE_BACK);
 		 }
 	 }
 
@@ -163,7 +166,7 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 		 peace_img[0],
 		 true
 	 );
-
+#if 0
 	 // デバッグ赤枠(ピースの画像外枠)
 	 DrawBox(
 		 (int)peacePos.x,
@@ -173,6 +176,7 @@ bool PeaceBase::SystemInit(GameScene* gs) {
 		 GetColor(255, 0, 0),
 		 false
 	 );
+#endif
 
  }
 

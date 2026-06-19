@@ -167,8 +167,7 @@ protected:
 	//Šg‘å/k¬—Ê
 	int wide;
 
-	//‰æ‘œ‚ÌŒü‚«İ’è
-	void SetPeaceDirection(Vector2 pdir);
+
 
 	Vector2F correctPos;
 	bool isPlaced = false;

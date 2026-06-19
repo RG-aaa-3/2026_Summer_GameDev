@@ -6,6 +6,7 @@ class Fader;
 class Result;
 class TitleScene;
 class ModeSelect;
+class HowtoPlay;
 
 
 class SceneManager
@@ -32,6 +33,8 @@ private:
 	Result* rs;
 	TitleScene* title;
 	ModeSelect* mode;
+	HowtoPlay* how;
+
 
 	void Update(void);
 	void Draw(void);

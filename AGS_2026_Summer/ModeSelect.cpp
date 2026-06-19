@@ -81,7 +81,7 @@ void ModeSelect::Draw(void) {
 	BoarderTextUpdate();
 
 
-	DrawFormatString(0, 1000, GetColor(255, 255, 255), "ゲームをやめる[Esc]");
+	DrawFormatString(0, 1000, GetColor(255, 255, 255), "ゲームをやめる[Esc]/操作説明[X]");
 
 	
 	
@@ -133,7 +133,7 @@ void ModeSelect::ChangeModePicture() {
 		DrawFormatString(x-80, y, GetColor(0, 0, 0), "BASIC");
 		break;
 	case E_MODE_ARENA:
-		DrawFormatString(x-80, y, GetColor(255, 0, 0), "まだないよ");
+		DrawFormatString(x-80, y, GetColor(255, 0, 0), "ARENA");
 		break;
 
 	}
@@ -192,7 +192,8 @@ void ModeSelect::Input() {
 	if (inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT) || CheckHitKey(KEY_INPUT_SPACE))
 		nowSpaceKey = 1;
 	
-
+	if (inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT) || CheckHitKey(KEY_INPUT_X))
+		nextSceneID = E_SCENE_HOW;
 
 	
 
@@ -294,10 +295,15 @@ void ModeSelect::SubmitGame(void){
 void ModeSelect::GameQuitkakunin() {
 	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
 
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
 
 
-	if (CheckHitKey(KEY_INPUT_RIGHT))imgtrg = 2;
-	if (CheckHitKey(KEY_INPUT_LEFT))imgtrg = 1;
+	if (CheckHitKey(KEY_INPUT_RIGHT) || analogKeyX < 0)imgtrg = 2;
+	if (CheckHitKey(KEY_INPUT_LEFT) || analogKeyX > 0)imgtrg = 1;
 
 	prevSpaceKey = nowSpaceKey;
 
@@ -320,13 +326,16 @@ void ModeSelect::GameQuitkakuninDraw() {
 	DrawFormatString(SceneManager::SCREEN_SIZE_WID / 3, SceneManager::SCREEN_SIZE_HIG / 4,
 		GetColor(255, 255, 255), "ゲームを終了しますか？");
 
+
+	InputManager& inputIns = InputManager::GetInstance();
+
 	switch (imgtrg) {
 	case 1:			//Yesにソート
 		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, yesimg, true);
 		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
 
 
-		if (CheckHitKey(KEY_INPUT_SPACE))nextSceneID = E_SCENE_QUIT;
+		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))nextSceneID = E_SCENE_QUIT;
 
 
 		break;
@@ -334,7 +343,7 @@ void ModeSelect::GameQuitkakuninDraw() {
 		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, noimg, true);
 		DrawGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, yesimg, true);
 
-		if (CheckHitKey(KEY_INPUT_SPACE))Quitkakunin = false;
+		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))Quitkakunin = false;
 
 		break;
 	}
