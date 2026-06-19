@@ -28,7 +28,7 @@ class GameScene
 	void Draw(void);				//描画処理
 	bool Release(void);				//解放処理(最後の１回のみ実行)
 
-	void CollisionCheck(void);
+
 	
 	bool IsSameShapeDir(int type, int dirA, int dirB);
 
@@ -39,11 +39,62 @@ class GameScene
 	void MoveRandomPiecesOutside(int count);
 	void CheckFitPiece(PeaceBase* p);
 
-	bool IsClear(void);		
+
 
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
 	int GetScore(void) { return totalScore; }
+
+	void SetModeId(E_GAME_MODE_ID id) { modeId = id; }
+
+	//グリッド表示
+	void DrawGuideGrid(void);
+
+
+	//アリーナ用
+	void DrawGauge(
+		int x,
+		int y,
+		int width,
+		int height,
+		float value,
+		float maxValue
+	);
+
+	float Hp;
+	float Maxhp = 12800;
+	float attackDamage;
+
+	float EnemyHp = 100;
+	float nowEnemyHp = 100;
+	float EnemyBoost = 1.2;
+
+	float enemyBaseHp = 100.0f;   // 基本HP
+	float enemyMaxHp = 100.0f;    // 現在の階層での最大HP
+
+
+	float enemyBoost = 1.2f;       // 階層ごとの強化倍率
+
+	int GetArenaFloor(void) const { return ArenaFloor; }
+	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
+	
+
+	//ゲーム途中終了
+	void GameQuitkakunin();
+	void GameQuitkakuninDraw();
+
+
+
+	//まとめ用
+	void BaseUpdate(void);
+
+	void BaseDraw(void);
+	void BasicDraw(void);
+
+
+	void ArenaUpdate(void);
+	void ArenaDraw(void);
+
 
 private:
 
@@ -73,8 +124,8 @@ private:
 
 	int startCountFrame = 0;
 
-	// 後から変更しやすい表示時間
-	int readyDisplayFrame = 40; // 60フレーム = 約1秒
+	// 表示時間
+	int readyDisplayFrame = 60; // 60フレーム = 約1秒
 	int goDisplayFrame = 50;
 
 	void UpdateStartSequence(void);
@@ -109,7 +160,7 @@ private:
 	static constexpr int CLEAR_WAIT_FRAME = 60; // 60フレーム待って次の問題へ
 	int clearWaitFrame = 0;
 
-	static constexpr int TIME_UP_WAIT_FRAME = 180;
+	static constexpr int TIME_UP_WAIT_FRAME = 180;//タイムアップ
 	int timeupWaitFrame = 0;
 
 
@@ -122,6 +173,8 @@ private:
 	//スコア
 	int totalScore = 0;
 	int lastAddScore = 0;
+
+	int ArenaFloor = 1;
 
 	int currentDifficultyBonus = 10;
 
@@ -161,6 +214,35 @@ private:
 	void ResetGuideFrame(void);
 	void AddGuideFrameRect(const Vector2F& pos, const Vector2& size);
 	void DrawGuideFrame(void);
+
+	E_GAME_MODE_ID modeId;
+
+	bool ClearStop = false;
+	
+
+	bool nowEscapeButton= false;
+
+	int EscapeCount = 0;
+	float CountReset = 1000.0f;//リセットまでのカウント
+
+
+
+	//確認画像
+	int yesimg;
+	int noimg;
+
+	int imgtrg = 1;
+
+	//SE用ハンドル
+	int readySe;
+	int goSe;
+
+
+	bool readySePlayed;
+	bool goSePlayed;
+
+	bool Quitkakunin = false;
+	int prevSpaceKey, nowSpaceKey;
 
 };
 

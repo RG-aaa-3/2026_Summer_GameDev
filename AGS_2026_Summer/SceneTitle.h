@@ -1,6 +1,9 @@
 #pragma once
 #include "StDefine.h"
 
+
+
+
 class TitleScene
 {
 public:
@@ -19,9 +22,23 @@ public:
 
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
+	void GameQuitkakunin(void);		//ゲーム終了確認
+	void GameQuitkakuninDraw();
+
+
 
 private:
+	
+	bool nowRightButton, prevRightButton = false;
 
+
+	//確認画像
+	int yesimg;
+	int noimg;
+
+	int imgtrg = 1;
+
+	bool Quitkakunin = false;
 
 	E_SCENE_ID nextSceneID;
 	int prevSpaceKey, nowSpaceKey;

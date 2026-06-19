@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 #include "PeaceT.h"
 #include "PeaceI.h"
 #include "PeaceS.h"
@@ -16,7 +17,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
+#include "InputManager.h"
+#include "SceneManager.h"
 
 
 
@@ -24,6 +26,17 @@ GameScene::GameScene(void) {
 	Cursor = nullptr;
 
 
+	yesimg = -1;
+	noimg = -1;
+
+
+	readySe = -1;
+	 goSe = -1;
+
+	 readySePlayed = false;
+	 goSePlayed = false;
+
+	modeId = E_MODE_BASIC;
 }
 
 GameScene::~GameScene(void) {
@@ -53,6 +66,26 @@ bool GameScene::SystemInit(void)
 	if (haikei == -1)	return false;
 
 
+	yesimg = LoadGraph("Screen/Yes.png");
+	noimg = LoadGraph("Screen/No.png");
+
+	if (yesimg == -1 || noimg == -1)return false;
+
+
+	readySe = LoadSoundMem("sound/ready.mp3");
+	goSe = LoadSoundMem("sound/go.mp3");
+
+	if (readySe == -1 || goSe == -1)return false;
+
+
+	Hp = Maxhp;
+
+	ArenaFloor = 1;
+
+	enemyMaxHp = enemyBaseHp;
+	nowEnemyHp = enemyMaxHp;
+
+
 	// 問題ファイル一覧
 	stageFileList.push_back("data/mondai1.txt");
 	stageFileList.push_back("data/mondai2.txt");
@@ -75,82 +108,54 @@ bool GameScene::SystemInit(void)
 void GameScene::GameInit(void) {
 	Cursor->GameInit();
 
+	prevSpaceKey = nowSpaceKey = 0;
 	nextSceneID = E_SCENE_GAME;
 }
 
 
 void GameScene::Update(void)
 {
-	//ゲーム開始前
-	if (gamePhase != GAME_PHASE::PLAY)
+	switch (modeId)
 	{
-		UpdateStartSequence();
-		return;
+
+	case E_MODE_BASIC:
+
+		BaseUpdate();
+
+		break;
+	case E_MODE_ARENA:
+
+		BaseUpdate();
+		ArenaUpdate();
+
+		break;
+
 	}
 
-	if (IsTimeUp())
-	{
-		timeupWaitFrame++;
-
-		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME)
-		{
-			nextSceneID = E_SCENE_RESULT;
-		}
-
-		return;
-	}
-
-	if (isClear)
-	{
-		clearWaitFrame++;
-
-		if (clearWaitFrame >= CLEAR_WAIT_FRAME)
-		{
-			StartNewPuzzle();
-		}
-
-		return;
-	}
-
-	Cursor->Update();
-
-	Vector2F cursorPos = Cursor->GetPos();
-
-	bool holdButton = CheckHitKey(KEY_INPUT_SPACE);
-	bool rotateLeftButton = CheckHitKey(KEY_INPUT_V);
-	bool rotateRightButton = CheckHitKey(KEY_INPUT_N);
-
-	for (int i = 0; i < peace.size(); i++)
-	{
-		if (peace[i] == nullptr) continue;
-
-		peace[i]->Update(
-			cursorPos,
-			holdButton,
-			rotateLeftButton,
-			rotateRightButton
-		);
-
-		if (peace[i]->IsReleasedThisFrame())
-		{
-			CheckFitPiece(peace[i]);
-		}
-	}
-
-	if (CheckClear())
-	{
-		AddClearScore();
-
-		isClear = true;
-		clearWaitFrame = 0;
-	}
 }
 void GameScene::Draw(void) {
 	
-	
-	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
 
-	DrawGuideFrame();
+	switch (modeId)
+	{
+
+	case E_MODE_BASIC:
+
+		BaseDraw();
+		BasicDraw();
+
+		break;
+	case E_MODE_ARENA:
+
+		BaseDraw();
+		ArenaDraw();
+
+
+		break;
+
+	}
+
+
 
 #if 0
 
@@ -176,104 +181,6 @@ void GameScene::Draw(void) {
 #endif
 
 
-	for (int i = 0; i < peace.size(); i++)
-	{
-		if (peace[i] == nullptr) continue;
-
-		if (peace[i]->IsHolding() == false)
-		{
-			peace[i]->Draw();
-		}
-	}
-
-	//固定済みピースを最初に描画
-	for (int i = 0; i < peace.size(); i++)
-	{
-		if (peace[i] == nullptr) continue;
-
-		if (peace[i]->IsPlaced())
-		{
-			peace[i]->Draw();
-		}
-	}
-
-	//まだ固定されていないかつ持っていないピース
-	for (int i = 0; i < peace.size(); i++)
-	{
-		if (peace[i] == nullptr) continue;
-
-		if (!peace[i]->IsPlaced() && !peace[i]->IsHolding())
-		{
-			peace[i]->Draw();
-		}
-	}
-
-	//持っているピースを最後に描画    (ピースの中では最前面)
-	for (int i = 0; i < peace.size(); i++)
-	{
-		if (peace[i] == nullptr) continue;
-
-		if (peace[i]->IsHolding())
-		{
-			peace[i]->Draw();
-		}
-	}
-	Cursor->Draw();
-
-	float elapsed = isClear ? lastElapsedTime : GetElapsedTime();
-
-	float remaining = GetRemainingTime();
-
-	SetFontSize(48);
-
-	DrawFormatString(
-		1440,
-		20,
-		GetColor(255, 255, 255),
-		"SCORE\n %d",
-		totalScore
-	);
-
-
-
-	DrawFormatString(
-		40,
-		60,
-		GetColor(255, 255, 255),
-		"TIME : %.2f",
-		remaining
-	);
-
-
-	//Ready・Goの表示
-	DrawStartSequence();
-
-
-	if (isClear)
-	{
-		DrawString(
-			850,
-			450,
-			"CLEAR!",
-			GetColor(255, 255, 0)
-		);
-
-
-	}
-
-	if (IsTimeUp())
-	{
-		SetFontSize(64);
-
-		DrawString(
-			780,
-			450,
-			"TIME UP!",
-			GetColor(0, 34, 204)
-		);
-
-
-	}
 
 }
 
@@ -300,11 +207,82 @@ bool GameScene::Release(void) {
 		delete Cursor;
 		Cursor = nullptr;
 	}
+	if (readySe != -1)
+	{
+		DeleteSoundMem(readySe);
+		readySe = -1;
+	}
+
+	if (goSe != -1)
+	{
+		DeleteSoundMem(goSe);
+		goSe = -1;
+	}
 
 	return true;
 }
 
 
+
+void GameScene::DrawGauge(
+	int x,
+	int y,
+	int width,
+	int height,
+	float value,
+	float maxValue
+)
+{
+	if (maxValue <= 0.0f)
+	{
+		return;
+	}
+
+	// 0.0 ～ 1.0 にする
+	float rate = value / maxValue;
+
+	if (rate < 0.0f) rate = 0.0f;
+	if (rate > 1.0f) rate = 1.0f;
+
+	// 減るほど 緑 → 赤
+	int red = (int)(255 * (1.0f - rate));
+	int green = (int)(255 * rate);
+	int blue = 0;
+
+	int gaugeColor = GetColor(red, green, blue);
+
+	// 黒背景
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(0, 0, 0),
+		true
+	);
+
+	// 残っている部分
+	int fillWidth = (int)(width * rate);
+
+	DrawBox(
+		x,
+		y,
+		x + fillWidth,
+		y + height,
+		gaugeColor,
+		true
+	);
+
+	// 外枠
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(255, 255, 255),
+		false
+	);
+}
 
 
 
@@ -572,15 +550,15 @@ void GameScene::MoveRandomPiecesOutside(int count)
 		p->SetTargetIndex(-1);
 		p->SetPlaced(false);
 
-		// ここで外に出したピースの向きをランダムにする
+		//外に出したピースの向きをランダムに
 		int randomDir = GetRand(3); // 0,1,2,3
 		p->SetPeaceDir(randomDir);
 
 		Vector2F outPos;
-		outPos.x = 500.0f + moved * 100.0f;
+		outPos.x = 500.0f + moved * 300.0f;		//movedの値=ピースの間隔
 		outPos.y = 760.0f;
 
-		// 画像キャンバスではなく、ミノ本体をこの位置に置きたい場合
+		//ミノ本体をこの位置に置く
 		p->SetBodyPos(outPos);
 
 		moved++;
@@ -600,7 +578,7 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 
 	Vector2F pos = p->GetJudgePos();
 
-	const float fitRange = 60.0f;
+	const float fitRange = 60.0f;	//正解距離範囲
 
 	int bestIndex = -1;
 	float bestDistSq = fitRange * fitRange;
@@ -643,6 +621,9 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 		p->SetTargetIndex(bestIndex);
 
 		fitTargets[bestIndex].occupied = true;
+
+
+		PlaySound("sound/piece_fit.mp3", DX_PLAYTYPE_BACK);
 	}
 }
 
@@ -685,6 +666,7 @@ void GameScene::StartNewPuzzle(void)
 
 	isClear = false;
 	clearWaitFrame = 0;
+	ClearStop = false;
 
 	if (LoadRandomStageFile() == false)
 	{
@@ -702,6 +684,8 @@ void GameScene::StartNewPuzzle(void)
 
 	CreateStageFromText(stageList[index].text);
 
+
+	//ここで難易度ごとに外す数変える
 	MoveRandomPiecesOutside(GetRand(3)+1);
 
 	lastAddScore = 0;
@@ -825,6 +809,9 @@ void GameScene::AddClearScore(void)
 
 	lastAddScore = CalcAddScore(lastElapsedTime);
 	totalScore += lastAddScore;
+
+	attackDamage = lastAddScore;
+
 }
 
 float GameScene::GetGameElapsedTime(void) const
@@ -933,7 +920,7 @@ bool GameScene::IsSameShapeDir(int type, int dirA, int dirB)
 		return dirA == dirB;
 
 	case 7:
-		// Tミノ：基本は4方向すべて別
+		// Tミノ：4方向すべて別
 		return dirA == dirB;
 
 	default:
@@ -947,6 +934,12 @@ void GameScene::UpdateStartSequence(void)
 
 	if (gamePhase == GAME_PHASE::READY)
 	{
+		if (!readySePlayed) {
+			PlaySoundMem(readySe, DX_PLAYTYPE_BACK);
+			readySePlayed = true;
+		}
+
+
 		if (startCountFrame >= readyDisplayFrame)
 		{
 			gamePhase = GAME_PHASE::GO;
@@ -955,6 +948,15 @@ void GameScene::UpdateStartSequence(void)
 	}
 	else if (gamePhase == GAME_PHASE::GO)
 	{
+
+		if (!goSePlayed) {
+			PlaySoundMem(goSe, DX_PLAYTYPE_BACK);
+			goSePlayed = true;
+
+
+		}
+
+
 		if (startCountFrame >= goDisplayFrame)
 		{
 			BeginPlay();
@@ -985,10 +987,12 @@ void GameScene::DrawStartSequence(void)
 
 	if (gamePhase == GAME_PHASE::READY)
 	{
+
 		img = readyImg;
 	}
 	else if (gamePhase == GAME_PHASE::GO)
 	{
+
 		img = goImg;
 	}
 
@@ -1096,4 +1100,450 @@ void GameScene::DrawGuideFrame(void)
 		color,
 		true
 	);
+}
+
+
+void GameScene::DrawGuideGrid(void)
+{
+	if (!hasGuideFrame)
+	{
+		return;
+	}
+
+	int color = GetColor(0, 0, 0);
+
+	int left = (int)guideLeft;
+	int top = (int)guideTop;
+	int right = (int)guideRight;
+	int bottom = (int)guideBottom;
+
+	// 縦線
+	for (int x = left; x <= right; x += CELL_SIZE)
+	{
+		DrawLine(
+			x,
+			top,
+			x,
+			bottom,
+			color
+		);
+	}
+
+	// 横線
+	for (int y = top; y <= bottom; y += CELL_SIZE)
+	{
+		DrawLine(
+			left,
+			y,
+			right,
+			y,
+			color
+		);
+	}
+}
+
+
+
+
+void GameScene::BaseUpdate() {
+
+
+
+
+
+	//ゲーム開始前
+	if (gamePhase != GAME_PHASE::PLAY)
+	{
+		UpdateStartSequence();
+		return;
+	}
+
+	if (IsTimeUp()&&modeId==E_MODE_BASIC)
+	{
+		timeupWaitFrame++;
+
+		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME)
+		{
+			nextSceneID = E_SCENE_RESULT;
+		}
+
+		return;
+	}
+
+	if (isClear)
+	{
+		clearWaitFrame++;
+
+		if (clearWaitFrame >= CLEAR_WAIT_FRAME)
+		{
+			StartNewPuzzle();
+		}
+
+		return;
+	}
+
+	Cursor->Update();
+
+	Vector2F cursorPos = Cursor->GetPos();
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+	
+
+	bool holdButton = CheckHitKey(KEY_INPUT_SPACE) ||
+		inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::RIGHT);
+
+	bool rotateLeftButton = CheckHitKey(KEY_INPUT_V) ||
+		inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::L_TRIGGER);
+
+	bool rotateRightButton = CheckHitKey(KEY_INPUT_N) ||
+		inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::R_TRIGGER);
+
+	bool alreadyHolding = false;
+
+	for (int i = (int)peace.size() - 1; i >= 0; i--)
+	{
+		if (peace[i] == nullptr) continue;
+
+		bool canStartHold = !alreadyHolding;
+
+		peace[i]->Update(
+			cursorPos,
+			holdButton,
+			rotateLeftButton,
+			rotateRightButton,
+			canStartHold
+		);
+
+		if (!alreadyHolding && peace[i]->IsHolding())
+		{
+			alreadyHolding = true;
+		}
+
+		if (peace[i]->IsReleasedThisFrame())
+		{
+			CheckFitPiece(peace[i]);
+		}
+	}
+
+
+	if (CheckClear())
+	{
+		AddClearScore();
+
+		isClear = true;
+		clearWaitFrame = 0;
+	}
+
+	CountReset--;
+	if (CountReset <= 0) {
+		EscapeCount = 0;
+		CountReset = 1000.0f;
+	}
+
+
+
+	nowEscapeButton = inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT);
+
+
+
+	if (CheckHitKey(KEY_INPUT_ESCAPE)||nowEscapeButton)Quitkakunin = true;
+
+	if (Quitkakunin)GameQuitkakunin();
+
+
+}
+
+
+void GameScene::BaseDraw() {
+
+
+
+
+
+	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
+
+	DrawGuideFrame();
+	DrawGuideGrid();
+
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (peace[i]->IsHolding() == false)
+		{
+			peace[i]->Draw();
+		}
+	}
+
+	//固定済みピースを最初に描画
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (peace[i]->IsPlaced())
+		{
+			peace[i]->Draw();
+		}
+	}
+
+	//まだ固定されていないかつ持っていないピース
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (!peace[i]->IsPlaced() && !peace[i]->IsHolding())
+		{
+			peace[i]->Draw();
+		}
+	}
+
+	//持っているピースを最後に描画    (ピースの中では最前面)
+	for (int i = 0; i < peace.size(); i++)
+	{
+		if (peace[i] == nullptr) continue;
+
+		if (peace[i]->IsHolding())
+		{
+			peace[i]->Draw();
+		}
+	}
+	Cursor->Draw();
+
+
+	DrawFormatString(0, 1000, GetColor(255, 255, 255), "モード選択に戻る[Esc]or[X]");
+
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+
+
+	//デバッグ用確認テキスト------------------------------
+	//DrawFormatString(20, 880, GetColor(255, 255, 255),
+	//"EscapeCount:%d", EscapeCount);
+
+
+	if (Quitkakunin)GameQuitkakuninDraw();
+}
+
+
+void GameScene::BasicDraw() {
+
+	float elapsed = isClear ? lastElapsedTime : GetElapsedTime();
+
+	float remaining = GetRemainingTime();
+
+	SetFontSize(48);
+
+	DrawFormatString(
+		1440,
+		20,
+		GetColor(255, 255, 255),
+		"SCORE\n %d",
+		totalScore
+	);
+
+
+
+	DrawFormatString(
+		40,
+		60,
+		GetColor(255, 255, 255),
+		"TIME : %.2f",
+		remaining
+	);
+
+
+	//Ready・Goの表示
+	DrawStartSequence();
+
+
+	if (isClear)
+	{
+		SetFontSize(48);
+		DrawString(
+			850,
+			450,
+			"GREAT",
+			GetColor(255, 255, 0)
+		);
+
+
+	}
+
+	if (IsTimeUp())
+	{
+		SetFontSize(64);
+
+		DrawString(
+			780,
+			450,
+			"TIME UP!",
+			GetColor(0, 34, 204)
+		);
+
+
+	}
+
+
+
+}
+
+void GameScene::ArenaDraw() {
+
+
+	DrawGauge(0, 40, 1920, 40, Hp, Maxhp);
+	DrawFormatString(0, 40, GetColor(255, 255, 255), "You HP ");
+
+	DrawGauge(0, 0, 1920, 40, nowEnemyHp, EnemyHp);
+	DrawFormatString(0, 0, GetColor(255, 255, 255), "Enemy HP ");
+
+
+	//Ready・Goの表示
+	DrawStartSequence();
+
+
+	DrawFormatString(
+		1440,
+		20,
+		GetColor(255, 255, 255),
+		"現在の階層 %d F",
+		ArenaFloor
+	);
+
+
+
+	if (isClear)
+	{
+		SetFontSize(48);
+		DrawString(
+			850,
+			450,
+			"GREAT",
+			GetColor(255, 255, 0)
+		);
+	}
+
+
+	if (Hp <= 0) {
+
+		SetFontSize(64);
+
+		DrawString(
+			780,
+			450,
+			"GAME OVER",
+			GetColor(0, 34, 204)
+		);
+
+		nextSceneID = E_SCENE_RESULT;
+	}
+
+}
+
+
+void GameScene::ArenaUpdate() {
+
+
+	if (gamePhase == GAME_PHASE::PLAY)Hp--;
+
+	if (CheckClear()== true &&ClearStop==false) {
+
+		Hp += 500;
+
+
+
+		ClearStop = true;
+
+		nowEnemyHp -= attackDamage;
+
+		if (nowEnemyHp <= 0) {
+
+			ArenaFloor++;
+
+			enemyMaxHp = enemyBaseHp * powf(enemyBoost, ArenaFloor - 1);
+
+			nowEnemyHp = enemyMaxHp;
+		}
+
+	}
+
+
+	if (Hp <= 0) {
+
+		nextSceneID = E_SCENE_RESULT;
+		return;
+
+	}
+
+
+
+
+}
+
+
+void GameScene::GameQuitkakunin() {
+	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+
+
+	if (CheckHitKey(KEY_INPUT_RIGHT) || analogKeyX < 0)imgtrg = 2;
+	if (CheckHitKey(KEY_INPUT_LEFT) || analogKeyX > 0)imgtrg = 1;
+
+	prevSpaceKey = nowSpaceKey;
+
+}
+
+void GameScene::GameQuitkakuninDraw() {
+
+	// 背景を少し暗くする
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+
+	DrawBox(
+		0,
+		0,
+		1920,
+		1080,
+		GetColor(0, 0, 0),
+		true
+	);
+
+	SetFontSize(62);
+	DrawFormatString(SceneManager::SCREEN_SIZE_WID / 3, SceneManager::SCREEN_SIZE_HIG / 4,
+		GetColor(255, 255, 255), "モード選択にもどりますか？");
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+
+
+	switch (imgtrg) {
+	case 1:			//Yesにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, yesimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
+
+
+		if (CheckHitKey(KEY_INPUT_SPACE)|| inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))nextSceneID = E_SCENE_MODE;
+
+
+		break;
+	case 2:			//Noにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, noimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, yesimg, true);
+
+		if (CheckHitKey(KEY_INPUT_SPACE)|| inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))Quitkakunin = false;
+
+		break;
+	}
+
+
+
 }

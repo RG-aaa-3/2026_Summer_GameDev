@@ -5,6 +5,8 @@
 #include "Result.h"
 #include "SceneTitle.h"
 #include "ModeSelect.h"
+#include "InputManager.h"
+#include "HowtoPlay.h"
 
 SceneManager::SceneManager(void) {
 	gs = nullptr;
@@ -12,6 +14,7 @@ SceneManager::SceneManager(void) {
 	rs = nullptr;
 	title = nullptr;
 	mode = nullptr;
+	how = nullptr;
 
 	scene_ID = waitScene = E_SCENE_NON;
 
@@ -22,7 +25,7 @@ SceneManager::~SceneManager(void) {
 }
 
 void SceneManager::Run(void) {
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0){
+	while (ProcessMessage() == 0 && GameQuit==false){
 
 	Update();
 	Draw();
@@ -63,6 +66,8 @@ bool SceneManager::SystemInit(void) {
 
 void SceneManager::Update(void)
 {
+	InputManager::GetInstance().Update();
+
 	fader->Update();
 
 	// フェードアウトが終わったら、待機中のシーンへ切り替え
@@ -82,6 +87,14 @@ void SceneManager::Update(void)
 
 	// ここから通常時のシーン更新
 	E_SCENE_ID nextSceneID = scene_ID;
+
+	//ゲーム終了判定
+	if (nextSceneID == E_SCENE_QUIT)
+	{
+		GameQuit = true;
+		return;
+	}
+
 
 	switch (scene_ID)
 	{
@@ -114,21 +127,35 @@ void SceneManager::Update(void)
 			nextSceneID = rs->GetNextSceneID();
 		}
 		break;
+	case E_SCENE_HOW:
+		if (how != nullptr)
+		{
+			how->UpDate();
+			nextSceneID = how->GetNextSceneID();
+
+		}
+		break;
+
 	}
 
-	if (scene_ID != nextSceneID) {
-
-		// モード選択からゲームへ行く直前にボーダーを保存
-		if (scene_ID == E_SCENE_MODE && nextSceneID == E_SCENE_GAME) {
-			if (mode != nullptr) {
+	if (scene_ID != nextSceneID)
+	{
+		if (scene_ID == E_SCENE_MODE && nextSceneID == E_SCENE_GAME)
+		{
+			if (mode != nullptr)
+			{
+				selectedModeId = mode->GetModeId();
 				resultBorderPoint = mode->GetBorderPoint();
 			}
 		}
 
-		// ゲームからリザルトへ行く直前にスコアを保存
-		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT) {
-			if (gs != nullptr) {
+		if (scene_ID == E_SCENE_GAME && nextSceneID == E_SCENE_RESULT)
+		{
+			if (gs != nullptr)
+			{
 				resultScore = gs->GetScore();
+				resultArenaFloor = gs->GetArenaFloor();
+				resultModeId = gs->GetModeId();
 			}
 		}
 
@@ -162,6 +189,9 @@ void SceneManager::Draw(void) {
 	case E_SCENE_RESULT:
 		rs->Draw();
 		break;
+	case E_SCENE_HOW:
+		how->Draw();
+		break;
 
 	}
 	fader->Draw();
@@ -179,6 +209,7 @@ bool SceneManager::Release(void) {
 	ReleaseScene(E_SCENE_MODE);
 	ReleaseScene(E_SCENE_GAME);
 	ReleaseScene(E_SCENE_RESULT);
+	ReleaseScene(E_SCENE_HOW);
 
 	fader->Release();
 	delete fader;
@@ -220,26 +251,45 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 		break;
 
 	case E_SCENE_GAME:
-		if (gs == nullptr) {
+		if (gs == nullptr)
+		{
 			gs = new GameScene();
-			if (gs == nullptr)return false;
-			gs->SystemInit();
-			gs->GameInit();
+			if (gs == nullptr) return false;
 
+			gs->SetModeId(selectedModeId);
+
+			if (gs->SystemInit() == false) return false;
+			gs->GameInit();
 		}
 		break;
 
 	case E_SCENE_RESULT:
-		if (rs == nullptr) {
+		if (rs == nullptr)
+		{
 			rs = new Result();
 			if (rs == nullptr) return false;
 
 			rs->SystemInit();
-			rs->SetResultData(resultScore, resultBorderPoint);
+
+			rs->SetResultData(
+				resultScore,
+				resultBorderPoint,
+				resultModeId,
+				resultArenaFloor
+			);
+
 			rs->GameInit();
-
 		}
-
+		break;
+	case E_SCENE_HOW:
+		if (how == nullptr)
+		{
+			how = new HowtoPlay();
+			if (how == nullptr)return false;
+			how->SystemInit();
+			how->GameInit();
+			
+		}
 		break;
 
 	}
@@ -285,8 +335,23 @@ void SceneManager::ReleaseScene(E_SCENE_ID id) {
 			rs = nullptr;
 		}
 		break;
+	case E_SCENE_HOW:
+		if (how != nullptr)
+		{
+			how->Release();
+			delete how;
+			how = nullptr;
+		}
 
+		break;
 	}
 
+
+}
+
+
+void SceneManager::GameEnd() {
+
+	GameQuit = true;
 
 }

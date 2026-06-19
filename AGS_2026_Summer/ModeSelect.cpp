@@ -1,6 +1,7 @@
 #include "ModeSelect.h"
 #include<DxLib.h>
 #include "SceneManager.h"
+#include "InputManager.h"
 
 ModeSelect::ModeSelect() {
 
@@ -8,6 +9,9 @@ ModeSelect::ModeSelect() {
 	lv1img = -1;
 	lv2img = -1;
 	lv3img = -1;
+	haikei = -1;
+	yesimg = -1;
+	noimg = -1;
 
 }
 
@@ -25,9 +29,13 @@ bool ModeSelect::SystemInit(void) {
 	lv2img = LoadGraph("image/GameLevel_Lv2.png");
 	lv3img = LoadGraph("image/GameLevel_Lv3.png");
 
+	yesimg = LoadGraph("Screen/Yes.png");
+	noimg = LoadGraph("Screen/No.png");
+
 	haikei = LoadGraph("Screen/haikei.png");
 	if (haikei == -1)	return false;
 
+	if (yesimg == -1 || noimg == -1)return false;
 
 	if (lv1img == -1 || lv2img == -1 || lv3img == -1)return false;
 
@@ -52,11 +60,18 @@ void ModeSelect::GameInit(void) {
 
 void ModeSelect::Update(void) {
 
-	Input();
+	if (Quitkakunin == false) Input();
+
+
+	if (Quitkakunin)GameQuitkakunin();
+
 
 }
 
 void ModeSelect::Draw(void) {
+
+	if(Quitkakunin==false)SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 	DrawRotaGraph(800, -40, 2.5, 0, haikei, true);
 
 
@@ -64,6 +79,15 @@ void ModeSelect::Draw(void) {
 	ChangeDiffPicture();
 	ChangeModePicture();
 	BoarderTextUpdate();
+
+
+	DrawFormatString(0, 1000, GetColor(255, 255, 255), "ゲームをやめる[Esc]/操作説明[X]");
+
+	
+	
+	if (Quitkakunin)GameQuitkakuninDraw();
+
+
 
 }
 
@@ -106,10 +130,10 @@ void ModeSelect::ChangeModePicture() {
 
 	switch (modeId) {
 	case E_MODE_BASIC:
-		DrawFormatString(x, y, GetColor(0, 0, 0), "B");
+		DrawFormatString(x-80, y, GetColor(0, 0, 0), "BASIC");
 		break;
 	case E_MODE_ARENA:
-		DrawFormatString(x, y, GetColor(0, 0, 0), "A");
+		DrawFormatString(x-80, y, GetColor(255, 0, 0), "ARENA");
 		break;
 
 	}
@@ -119,17 +143,59 @@ void ModeSelect::ChangeModePicture() {
 
 void ModeSelect::Input() {
 
-		nowKeyInputL = CheckHitKey(KEY_INPUT_LEFT);
 
-		nowKeyInputR = CheckHitKey(KEY_INPUT_RIGHT);
+	nowKeyInputD = nowKeyInputL = nowKeyInputR = nowKeyInputU = nowSpaceKey = 0;
 
-		nowKeyInputU = CheckHitKey(KEY_INPUT_UP);
 
-		nowKeyInputD = CheckHitKey(KEY_INPUT_DOWN);
+
+	if (CheckHitKey(KEY_INPUT_ESCAPE))Quitkakunin = true;
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+	int analogKeyY = state.AKeyLY;
+
+
+
+	//上下左右
+	if (analogKeyX < 0 || CheckHitKey(KEY_INPUT_RIGHT)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 0;
+		nowKeyInputR = 1;
+		nowKeyInputL = 0;
+	}
+	if (analogKeyX > 0 ||CheckHitKey(KEY_INPUT_LEFT)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 0;
+		nowKeyInputR = 0;
+		nowKeyInputL = 1;
+	}
+	if (analogKeyY < 0 ||CheckHitKey(KEY_INPUT_UP)) {
+		nowKeyInputU = 1;
+		nowKeyInputD = 0;
+		nowKeyInputR = 0;
+		nowKeyInputL = 0;
+	}
+	if (analogKeyY > 0 ||CheckHitKey(KEY_INPUT_DOWN)) {
+		nowKeyInputU = 0;
+		nowKeyInputD = 1;
+		nowKeyInputR = 0;
+		nowKeyInputL = 0;
+
+	}
+
+
+
 	
-		nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+	if (inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT) || CheckHitKey(KEY_INPUT_SPACE))
+		nowSpaceKey = 1;
+	
+	if (inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT) || CheckHitKey(KEY_INPUT_X))
+		nextSceneID = E_SCENE_HOW;
 
-
+	
 
 	//左右操作でモード切替、上下操作で難易度変更
 	if (nowKeyInputL==0&&prevKeyInputL==1) {
@@ -145,7 +211,10 @@ void ModeSelect::Input() {
 		diffId = (enum E_GAME_DIFF_ID)((int)diffId - 1);
 	}
 
-	if (nowSpaceKey == 0 && prevSpaceKey == 1) {
+	
+
+
+	if (nowSpaceKey == 1 && prevSpaceKey == 0) {
 		SubmitGame();
 	}
 
@@ -163,6 +232,7 @@ void ModeSelect::Input() {
 	prevKeyInputU = nowKeyInputU;
 	prevKeyInputD = nowKeyInputD;
 	prevSpaceKey = nowSpaceKey;
+
 
 }
 
@@ -211,10 +281,7 @@ void ModeSelect::SubmitGame(void){
 	SetFontSize(48);
 	switch (modeId) {
 	case E_MODE_ARENA:
-		Texttime = 400;
-		if (Texttime > 0) {
-			DrawFormatString(x, y, GetColor(0, 0, 0), "まだないよ");
-		}
+		nextSceneID = E_SCENE_GAME;
 		break;
 	case E_MODE_BASIC:
 		nextSceneID = E_SCENE_GAME;
@@ -222,4 +289,65 @@ void ModeSelect::SubmitGame(void){
 		break;
 	}
 	Texttime--;
+}
+
+
+void ModeSelect::GameQuitkakunin() {
+	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	int analogKeyX = state.AKeyLX;
+
+
+	if (CheckHitKey(KEY_INPUT_RIGHT) || analogKeyX < 0)imgtrg = 2;
+	if (CheckHitKey(KEY_INPUT_LEFT) || analogKeyX > 0)imgtrg = 1;
+
+	prevSpaceKey = nowSpaceKey;
+
+}
+
+void ModeSelect::GameQuitkakuninDraw() {
+
+	// 背景を少し暗くする
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+
+	DrawBox(
+		0,
+		0,
+		1920,
+		1080,
+		GetColor(0, 0, 0),
+		true
+	);
+
+	DrawFormatString(SceneManager::SCREEN_SIZE_WID / 3, SceneManager::SCREEN_SIZE_HIG / 4,
+		GetColor(255, 255, 255), "ゲームを終了しますか？");
+
+
+	InputManager& inputIns = InputManager::GetInstance();
+
+	switch (imgtrg) {
+	case 1:			//Yesにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, yesimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
+
+
+		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))nextSceneID = E_SCENE_QUIT;
+
+
+		break;
+	case 2:			//Noにソート
+		DrawRotaGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, 1.5, 0, noimg, true);
+		DrawGraph(SceneManager::SCREEN_SIZE_WID / 4, SceneManager::SCREEN_SIZE_HIG / 2, yesimg, true);
+
+		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))Quitkakunin = false;
+
+		break;
+	}
+
+
+
 }

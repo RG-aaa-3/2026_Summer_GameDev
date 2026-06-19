@@ -30,8 +30,12 @@ public:
 
 	int GetBorderPoint(void);
 
+	void GameQuitkakunin(void);		//ゲーム終了確認
+	void GameQuitkakuninDraw();
 
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
+
+	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
 private:
 
 
@@ -40,12 +44,18 @@ private:
 	int lv2img;
 	int lv3img;
 
-	int haikei;
+	int haikei;		//背景
+
+	//確認画像
+	int yesimg;
+	int noimg;
+
+	int imgtrg = 1;
 
 	//難易度ごとのクリアポイント
-	int Easy = 300;
-	int Hard = 600;
-	int Master = 900;
+	int Easy = 100;
+	int Hard = 200;
+	int Master = 400;
 
 
 	int Texttime;
@@ -68,6 +78,8 @@ private:
 	int prevKeyInputD;
 	int prevKeyInputR;
 	int prevKeyInputL;
+
+	bool Quitkakunin = false;
 
 	E_GAME_MODE_ID modeId;
 
