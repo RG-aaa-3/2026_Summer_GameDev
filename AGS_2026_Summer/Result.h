@@ -65,6 +65,7 @@ public:
 		int score,
 		int border,
 		E_GAME_MODE_ID mode,
+		E_GAME_DIFF_ID diff,
 		int floor
 	);
 
@@ -72,26 +73,25 @@ public:
 
 	ModeSelect* mode;
 
-<<<<<<< HEAD
 	//リザルト画面のハンドル
 	int result;
 
-=======
-
-
-	//リザルト画面のハンドル**
-
-	int result;
 
 
 
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
+
+
+
 	E_SCENE_ID nextSceneID;
 
 	int prevNextKey, nowNextKey;
 
 
 	//スコアランキング用
+
+	E_GAME_DIFF_ID resultDiffId = E_DIFF_EASY;
+
+
 	 int firstscore;
 
 	int secondscore;

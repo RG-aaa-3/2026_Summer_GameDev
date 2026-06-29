@@ -11,8 +11,8 @@ class cursor
 	static constexpr int CURSOR_IMG_HIG = 48;	//カーソルアイコンの高さサイズ
 	static constexpr int CURSOR_IMG_WID = 48;	//カーソルアイコンの幅サイズ
 
-	static constexpr int CURSOR_MOVE_SPEED_X = 2;
-	static constexpr int CURSOR_MOVE_SPEED_Y = 2;
+	static constexpr int CURSOR_MOVE_SPEED_X = 4;
+	static constexpr int CURSOR_MOVE_SPEED_Y = 4;
 
 	Vector2F GetPos(void) const;
 

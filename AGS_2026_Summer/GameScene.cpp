@@ -683,10 +683,10 @@ void GameScene::StartNewPuzzle(void)
 	currentDifficultyBonus = stageList[index].difficultyBonus;
 
 	CreateStageFromText(stageList[index].text);
+	
+	SetOutNum();
 
-
-	//ここで難易度ごとに外す数変える
-	MoveRandomPiecesOutside(GetRand(3)+1);
+	MoveRandomPiecesOutside(GetRand(outpieceMaxnum)+1);
 
 	lastAddScore = 0;
 	lastElapsedTime = 0.0f;
@@ -697,6 +697,27 @@ void GameScene::StartNewPuzzle(void)
 	{
 		puzzleStartTimeMs = GetNowCount();
 	}
+}
+
+void GameScene::SetOutNum() {
+
+	switch (diffId) {
+
+	case E_DIFF_EASY:
+		outpieceMaxnum = 2;
+		break;
+
+	case E_DIFF_HARD:
+		outpieceMaxnum = 3;
+		break;
+
+	case E_DIFF_MASTER:
+		outpieceMaxnum = 4;
+		break;
+
+
+	}
+
 }
 
 
@@ -749,6 +770,27 @@ bool GameScene::LoadStageFile(const std::string& filePath)
 		{
 			data.difficultyBonus = 10;
 		}
+
+		//ここで難易度でswitchして難易度ごとに基礎点を変える
+
+		switch (diffId) {
+
+		case E_DIFF_EASY:
+			data.difficultyBonus = 10;
+			break;
+
+		case E_DIFF_HARD:
+			data.difficultyBonus = 30;
+			break;
+
+		case E_DIFF_MASTER:
+			data.difficultyBonus = 50;
+			break;
+
+
+		}
+
+
 
 		stageList.push_back(data);
 	}

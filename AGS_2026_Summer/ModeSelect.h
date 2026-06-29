@@ -36,6 +36,8 @@ public:
 	E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
 	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
+
+	E_GAME_DIFF_ID GetDiffId(void) const { return diffId; }
 private:
 
 
