@@ -23,6 +23,8 @@
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="Fader.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="HowtoPlay.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModeSelect.cpp" />
     <ClCompile Include="PeaceBase.cpp" />
@@ -44,6 +46,8 @@
     <ClInclude Include="cursor.h" />
     <ClInclude Include="Fader.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="HowtoPlay.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="ModeSelect.h" />
     <ClInclude Include="PeaceBase.h" />
     <ClInclude Include="PeaceI.h" />
@@ -92,7 +96,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -162,9 +166,10 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(DXLIB_DIR)</AdditionalLibraryDirectories>
     </Link>

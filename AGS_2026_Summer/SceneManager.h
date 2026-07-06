@@ -44,6 +44,9 @@ private:
 	bool sceneChaneFlg;				//シーンチェンジ実行中フラグ	
 
 	E_GAME_MODE_ID selectedModeId = E_MODE_BASIC;
+
+	E_GAME_DIFF_ID selectedDiffId = E_DIFF_EASY;
+
 	//シーン遷移処理
 	bool ChangeScene(E_SCENE_ID  id);
 	void ReleaseScene(E_SCENE_ID id);
@@ -52,8 +55,12 @@ private:
 
 	int resultBorderPoint = 0;
 
+	int gamediff = 0;
+
+
 	int resultArenaFloor = 0;
 	E_GAME_MODE_ID resultModeId = E_MODE_BASIC;
+	E_GAME_DIFF_ID resultDiffId = E_DIFF_EASY;
 
 
 	//ゲーム終了フラグ

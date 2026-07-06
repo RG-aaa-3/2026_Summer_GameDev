@@ -45,10 +45,16 @@ class GameScene
 
 	int GetScore(void) { return totalScore; }
 
+
+	
 	void SetModeId(E_GAME_MODE_ID id) { modeId = id; }
+
+	void SetDiff(E_GAME_DIFF_ID diff) { diffId = diff; }
 
 	//グリッド表示
 	void DrawGuideGrid(void);
+
+	void SetOutNum(void);
 
 
 	//アリーナ用
@@ -77,6 +83,7 @@ class GameScene
 
 	int GetArenaFloor(void) const { return ArenaFloor; }
 	E_GAME_MODE_ID GetModeId(void) const { return modeId; }
+	E_GAME_DIFF_ID GetDiffId(void) const { return diffId; }
 	
 
 	//ゲーム途中終了
@@ -132,7 +139,7 @@ private:
 	void DrawStartSequence(void);
 	void BeginPlay(void);
 
-
+	int outpieceMaxnum;
 
 
 	std::vector<StageData> stageList;
@@ -216,6 +223,8 @@ private:
 	void DrawGuideFrame(void);
 
 	E_GAME_MODE_ID modeId;
+
+	E_GAME_DIFF_ID diffId;
 
 	bool ClearStop = false;
 	

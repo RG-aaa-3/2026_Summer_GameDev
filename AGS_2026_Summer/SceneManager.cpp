@@ -146,6 +146,7 @@ void SceneManager::Update(void)
 			{
 				selectedModeId = mode->GetModeId();
 				resultBorderPoint = mode->GetBorderPoint();
+				gamediff = mode->GetModeId();
 			}
 		}
 
@@ -156,6 +157,7 @@ void SceneManager::Update(void)
 				resultScore = gs->GetScore();
 				resultArenaFloor = gs->GetArenaFloor();
 				resultModeId = gs->GetModeId();
+				resultDiffId = gs->GetDiffId();
 			}
 		}
 
@@ -257,6 +259,7 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 			if (gs == nullptr) return false;
 
 			gs->SetModeId(selectedModeId);
+			gs->SetDiff(selectedDiffId);
 
 			if (gs->SystemInit() == false) return false;
 			gs->GameInit();
@@ -275,6 +278,7 @@ bool SceneManager::ChangeScene(E_SCENE_ID id) {
 				resultScore,
 				resultBorderPoint,
 				resultModeId,
+				resultDiffId,
 				resultArenaFloor
 			);
 

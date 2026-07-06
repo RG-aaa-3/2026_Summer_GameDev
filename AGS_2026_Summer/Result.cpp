@@ -6,17 +6,12 @@
 #include <algorithm>
 #include "ModeSelect.h"
 #include "SceneManager.h"
-<<<<<<< HEAD
-=======
 #include <functional>
 
-
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
 
 
 Result::Result(void) {
 
-<<<<<<< HEAD
 	result = -1;
 
 	firstscore = 0;
@@ -30,9 +25,6 @@ Result::Result(void) {
 	nowNextKey = 0;
 
 	clear = false;
-=======
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
-
 
 result = -1;
 
@@ -50,22 +42,14 @@ myscore = 0;
  prevscore = 0;
 
 
-
  prevNextKey = 0;
 
  nowNextKey = 0;
 
 
-
  clear = false;
 
-
-
-
-
  mode = nullptr;
-
-
 
 }
 
@@ -75,23 +59,17 @@ Result::~Result(void) {
 
 
 
-
-
-
-
 }
 
 
 
 bool Result::SystemInit() {
 
-<<<<<<< HEAD
 	result = LoadGraph("Screen/Result.png");
 	if (result == -1)return false;
 
 	LoadHighScoreFile();
-=======
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
+
 
 result = LoadGraph("Screen/Result.png"); 
 
@@ -118,12 +96,7 @@ void Result::GameInit() {
 
 nextSceneID = E_SCENE_RESULT;
 
-
-
  prevNextKey = nowNextKey = 0;
-
-
-
 
 
 }
@@ -133,9 +106,6 @@ nextSceneID = E_SCENE_RESULT;
 
 
 void Result::Update() {
-
-
-
 
  prevNextKey = nowNextKey;
 
@@ -149,10 +119,6 @@ nextSceneID = E_SCENE_TITLE;
 
 
 	}
-
-
-
-
 
 
 
@@ -217,14 +183,13 @@ void Result::Draw() {
 
 	int p = borderPoint;
 
-<<<<<<< HEAD
 	DrawRotaGraph3(SceneManager::SCREEN_SIZE_WID / 2, SceneManager::SCREEN_SIZE_HIG / 2, 
 		1024 / 2, 426 / 2, 1.875, 2.5, 0, result, false);
 
 	
-=======
+
 	DrawRotaGraph3(SceneManager::SCREEN_SIZE_WID / 2, SceneManager::SCREEN_SIZE_HIG / 2,1024 / 2, 426 / 2, 1.875, 2.5, 0, result, false);
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
+
 
 	SetFontSize(48);
 
@@ -251,7 +216,6 @@ void Result::Draw() {
 
 	if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 0), "LEVEL FAILED...");
 
-<<<<<<< HEAD
 		DrawFormatString(240, 80, GetColor(255, 255, 0), "1st:%d", firstscore);
 		DrawFormatString(240, 160, GetColor(200, 200, 200), "2nd:%d", secondscore);
 		DrawFormatString(240, 240, GetColor(204, 102, 0), "3rd:%d", thirdscore);
@@ -264,9 +228,6 @@ void Result::Draw() {
 		DrawFormatString(240, 500, GetColor(255, 0, 0),"BORDER:%d", p);
 		if (clear)DrawFormatString(480, 160, GetColor(255, 0, 0),"LEVEL CLEAR!!");
 		if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 0), "LEVEL FAILED...");
-=======
-
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
 
 }
 
@@ -277,11 +238,8 @@ void Result::Draw() {
 bool Result::Release() {
 
 	if (DeleteGraph(result) == -1)return false;
-<<<<<<< HEAD
-=======
 
 		 return true;
->>>>>>> 51482197ea8b21258f77f8e14bb7c2f23db22af0
 
 }
 
@@ -324,12 +282,15 @@ void Result::SetResultData(
 	int score,
 	int border,
 	E_GAME_MODE_ID mode,
+	E_GAME_DIFF_ID diff,
 	int floor
 )
 {
 	myscore = score;
 	borderPoint = border;
+	resultDiffId = diff;
 	resultModeId = mode;
+	
 	arenaFloor = floor;
 
 	if (resultModeId == E_MODE_ARENA)
@@ -347,34 +308,98 @@ void Result::SetResultData(
 bool Result::LoadHighScoreFile(void)
 
 {
+	switch (resultDiffId) {
+	case E_DIFF_EASY:
+	{
+		std::ifstream file("data/Easyscore.txt");
 
-	std::ifstream file("data/highscore.txt");
+
+		if (!file.is_open())
+		{
+
+			firstscore = 0;
+
+			secondscore = 0;
+
+			thirdscore = 0;
+			fourcescore = 0;
+
+			return false;
+
+		}
 
 
-	if (!file.is_open())
-	{	
+		file >> firstscore;
+		file >> secondscore;
+		file >> thirdscore;
+		file >> fourcescore;
+		file.close();
 
-		firstscore = 0;
+		return true;
+		break;
+	}
+	case E_DIFF_HARD:
 
-		secondscore = 0;
+	{
+		std::ifstream file("data/Hardscore.txt");
 
-		thirdscore = 0;
-		fourcescore = 0;
 
-	return false;
+		if (!file.is_open())
+		{
 
+			firstscore = 0;
+
+			secondscore = 0;
+
+			thirdscore = 0;
+			fourcescore = 0;
+
+			return false;
+
+		}
+
+
+		file >> firstscore;
+		file >> secondscore;
+		file >> thirdscore;
+		file >> fourcescore;
+		file.close();
+
+		return true;
+		break;
 	}
 
+	case E_DIFF_MASTER:
+
+	{
+		std::ifstream file("data/Masterscore.txt");
 
 
-	file >> firstscore;
-	 file >> secondscore;
-	 file >> thirdscore;
-	 file >> fourcescore;
-	file.close();
+		if (!file.is_open())
+		{
 
-	return true;
+			firstscore = 0;
 
+			secondscore = 0;
+
+			thirdscore = 0;
+			fourcescore = 0;
+
+			return false;
+
+		}
+
+
+		file >> firstscore;
+		file >> secondscore;
+		file >> thirdscore;
+		file >> fourcescore;
+		file.close();
+
+		return true;
+		break;
+	}
+	}
 }
 
 
@@ -383,34 +408,67 @@ bool Result::SaveHighScoreFile(void)
 
 {
 	
-	std::ofstream file("data/highscore.txt");
 
-
-
-	if (!file.is_open())
+	switch (resultDiffId) {
+	case E_DIFF_EASY:
 	{
+		std::ofstream file("data/Easyscore.txt");
 
-		return false;
+		if (!file.is_open())
+		{
+			return false;
+		}
 
+		file << firstscore << std::endl;
+		file << secondscore << std::endl;
+		file << thirdscore << std::endl;
+		file << fourcescore << std::endl;
+
+		file.close();
+
+		return true;
+		break;
 	}
+	case E_DIFF_HARD:
+	{
+		std::ofstream file("data/Hardscore.txt");
 
+		if (!file.is_open())
+		{
+			return false;
+		}
 
+		file << firstscore << std::endl;
+		file << secondscore << std::endl;
+		file << thirdscore << std::endl;
+		file << fourcescore << std::endl;
 
-	file << firstscore << std::endl;
+		file.close();
 
-	file << secondscore << std::endl;
+		return true;
+		break;
+	}
+	case E_DIFF_MASTER:
 
-	 file << thirdscore << std::endl;
+	{
+		std::ofstream file("data/Masterscore.txt");
 
-	file << fourcescore << std::endl;
+		if (!file.is_open())
+		{
+			return false;
+		}
 
+		file << firstscore << std::endl;
+		file << secondscore << std::endl;
+		file << thirdscore << std::endl;
+		file << fourcescore << std::endl;
 
+		file.close();
 
-	file.close();
-
-
-	 return true;
-
+		return true;
+		break;
+	}
+	}
 }
 
 
