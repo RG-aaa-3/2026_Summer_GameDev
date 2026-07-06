@@ -86,7 +86,10 @@ bool GameScene::SystemInit(void)
 	nowEnemyHp = enemyMaxHp;
 
 
+
 	// 問題ファイル一覧
+
+#if 0
 	stageFileList.push_back("data/mondai1.txt");
 	stageFileList.push_back("data/mondai2.txt");
 	stageFileList.push_back("data/mondai3.txt");
@@ -98,6 +101,15 @@ bool GameScene::SystemInit(void)
 	stageFileList.push_back("data/mondai9.txt");
 	stageFileList.push_back("data/mondai10.txt");
 	stageFileList.push_back("data/mondai11.txt");
+	stageFileList.push_back("data/mondai12.txt");
+	stageFileList.push_back("data/mondai13.txt");
+	stageFileList.push_back("data/mondai14.txt");
+	stageFileList.push_back("data/mondai15.txt");
+
+#endif
+	stageFileList.push_back("data/mondai16.txt");
+
+
 
 	StartNewPuzzle();
 
@@ -622,8 +634,16 @@ void GameScene::CheckFitPiece(PeaceBase* p)
 
 		fitTargets[bestIndex].occupied = true;
 
-
+		//はめた時の効果音再生
 		PlaySound("sound/piece_fit.mp3", DX_PLAYTYPE_BACK);
+
+
+
+		//ここではめるごとに得点追加する
+		totalScore += 5;
+
+
+
 	}
 }
 
