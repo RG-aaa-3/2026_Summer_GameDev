@@ -226,8 +226,6 @@ void Result::Draw() {
 	
 
 		DrawFormatString(240, 500, GetColor(255, 0, 0),"BORDER:%d", p);
-		if (clear)DrawFormatString(480, 160, GetColor(255, 0, 0),"LEVEL CLEAR!!");
-		if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 0), "LEVEL FAILED...");
 
 }
 

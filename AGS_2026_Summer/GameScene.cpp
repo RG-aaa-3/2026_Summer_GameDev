@@ -88,8 +88,6 @@ bool GameScene::SystemInit(void)
 
 
 	// –â‘èƒtƒ@ƒCƒ‹ˆê——
-
-#if 0
 	stageFileList.push_back("data/mondai1.txt");
 	stageFileList.push_back("data/mondai2.txt");
 	stageFileList.push_back("data/mondai3.txt");
@@ -105,9 +103,11 @@ bool GameScene::SystemInit(void)
 	stageFileList.push_back("data/mondai13.txt");
 	stageFileList.push_back("data/mondai14.txt");
 	stageFileList.push_back("data/mondai15.txt");
-
-#endif
 	stageFileList.push_back("data/mondai16.txt");
+	stageFileList.push_back("data/mondai17.txt");
+	stageFileList.push_back("data/mondai18.txt");
+	stageFileList.push_back("data/mondai19.txt");
+	stageFileList.push_back("data/mondai20.txt");
 
 
 
