@@ -77,7 +77,10 @@ public:
 	int result;
 
 
+	//Œø‰Ê‰¹‚Ìƒnƒ“ƒhƒ‹
+	int clearSe;
 
+	int failedSe;
 
 
 
