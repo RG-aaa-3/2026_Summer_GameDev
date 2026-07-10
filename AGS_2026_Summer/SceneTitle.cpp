@@ -46,7 +46,7 @@ void TitleScene::UpDate(void)
 		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
 	prevRightButton = nowRightButton;
-	nowRightButton = inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT);
+	nowRightButton = inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
 
 	prevSpaceKey = nowSpaceKey;
 	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);

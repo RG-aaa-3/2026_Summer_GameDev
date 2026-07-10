@@ -13,6 +13,7 @@ ModeSelect::ModeSelect() {
 	yesimg = -1;
 	noimg = -1;
 
+	msSe = -1;
 }
 
 
@@ -39,6 +40,9 @@ bool ModeSelect::SystemInit(void) {
 
 	if (lv1img == -1 || lv2img == -1 || lv3img == -1)return false;
 
+	msSe = LoadSoundMem("sound/ñÇâ§ç∞ ModeSelect.mp3");
+	if (msSe == -1) return false;
+
 	x = SceneManager::SCREEN_SIZE_WID / 2;
 	y = SceneManager::SCREEN_SIZE_HIG / 2;
 
@@ -52,6 +56,8 @@ bool ModeSelect::SystemInit(void) {
 
 void ModeSelect::GameInit(void) {
 
+	PlayMusic("sound/ñÇâ§ç∞ ModeSelect.mp3", DX_PLAYTYPE_LOOP);
+
 	modeId = E_MODE_BASIC;
 	diffId = E_DIFF_EASY;
 	nextSceneID = E_SCENE_MODE;
@@ -59,6 +65,10 @@ void ModeSelect::GameInit(void) {
 }
 
 void ModeSelect::Update(void) {
+
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
 	if (Quitkakunin == false) Input();
 
@@ -97,7 +107,11 @@ bool ModeSelect::Release(void) {
 	if (DeleteGraph(lv2img) == -1)return false;
 	if (DeleteGraph(lv3img) == -1)return false;
 
-
+	if (msSe != -1)
+	{
+		DeleteSoundMem(msSe);
+		msSe = -1;
+	}
 
 	return true;
 
@@ -276,21 +290,22 @@ void ModeSelect::BoarderTextUpdate(void) {
 
 }
 
-void ModeSelect::SubmitGame(void){
-	
-	SetFontSize(48);
+void ModeSelect::SubmitGame(void)
+{
+	StopMusic();
+
 	switch (modeId) {
 	case E_MODE_ARENA:
 		nextSceneID = E_SCENE_GAME;
 		break;
+
 	case E_MODE_BASIC:
 		nextSceneID = E_SCENE_GAME;
-
 		break;
 	}
+
 	Texttime--;
 }
-
 
 void ModeSelect::GameQuitkakunin() {
 	nowSpaceKey = CheckHitKey(KEY_INPUT_SPACE);
@@ -335,8 +350,10 @@ void ModeSelect::GameQuitkakuninDraw() {
 		DrawGraph(SceneManager::SCREEN_SIZE_WID - (SceneManager::SCREEN_SIZE_WID / 4), SceneManager::SCREEN_SIZE_HIG / 2, noimg, true);
 
 
-		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))nextSceneID = E_SCENE_QUIT;
-
+		if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
+			nextSceneID = E_SCENE_QUIT;
+			StopMusic();
+		}
 
 		break;
 	case 2:			//NoÇ…É\Å[Ég

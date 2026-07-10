@@ -8,7 +8,7 @@
 HowtoPlay::HowtoPlay() {
 	padimg = keyimg = -1;
 
-
+	htpSe = -1;
 }
 
 HowtoPlay::~HowtoPlay() {
@@ -22,9 +22,11 @@ bool HowtoPlay::SystemInit() {
 	padimg = LoadGraph("Screen/PADPlay.png");
 	keyimg = LoadGraph("Screen/KeyPlay.png");
 
-	if (padimg == -1 || keyimg == -1)return false;
+	htpSe = LoadSoundMem("sound/ñÇâ§ç∞ Tutorial.mp3");
 
+	if (padimg == -1 || keyimg == -1 || htpSe == -1)return false;
 
+	
 
 
 	return true;
@@ -32,6 +34,8 @@ bool HowtoPlay::SystemInit() {
 
 
 void HowtoPlay::GameInit(void) {
+
+	PlayMusic("sound/ñÇâ§ç∞ Tutorial.mp3", DX_PLAYTYPE_LOOP);
 
 	nextSceneID = E_SCENE_HOW;
 
@@ -59,10 +63,17 @@ void HowtoPlay::UpDate(void) {
 
 	}
 	if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
+		StopMusic();
 		nextSceneID = E_SCENE_MODE;
 	}
 
+	if (GetJoypadInputState(DX_INPUT_KEY_PAD1) & KEY_INPUT_B)
+	{
+		StopMusic();
+		nextSceneID = E_SCENE_MODE;
+	}
 
+	
 }
 
 
@@ -90,6 +101,12 @@ bool HowtoPlay::Release(void) {
 
 	if (DeleteGraph(padimg) == -1)return false;
 	if (DeleteGraph(keyimg) == -1)return false;
+
+	if (htpSe != -1) 
+	{
+		DeleteSoundMem(htpSe);
+		htpSe = -1;
+	}
 
 
 	return true;

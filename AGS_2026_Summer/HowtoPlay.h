@@ -22,6 +22,8 @@ public:
 private:
 	E_SCENE_ID nextSceneID;
 
+	int htpSe;
+
 
 	int nowimg;
 

@@ -40,6 +40,7 @@ public:
 	E_GAME_DIFF_ID GetDiffId(void) const { return diffId; }
 private:
 
+	int msSe;
 
 	//難易度選択画像のハンドル
 	int lv1img;

@@ -7,27 +7,16 @@
 #include "ModeSelect.h"
 #include "SceneManager.h"
 #include <functional>
-
+#include "InputManager.h"
 
 
 Result::Result(void) {
 
-	result = -1;
-
-	firstscore = 0;
-	secondscore = 0;
-	thirdscore = 0;
-	fourcescore = 0;
-	myscore = 0;
-	prevscore = 0;
-
-	prevNextKey = 0;
-	nowNextKey = 0;
-
-	clear = false;
-
 result = -1;
 
+clearSe = -1;
+
+failedSe = -1;
 
  firstscore = 0;
 
@@ -65,15 +54,14 @@ Result::~Result(void) {
 
 bool Result::SystemInit() {
 
-	result = LoadGraph("Screen/Result.png");
-	if (result == -1)return false;
-
-	LoadHighScoreFile();
 
 
 result = LoadGraph("Screen/Result.png"); 
 
 if (result == -1)return false;
+
+clearSe = LoadSoundMem("sound/StageClear.mp3");
+failedSe = LoadSoundMem("sound/StageFailed.mp3");
 
 
 LoadHighScoreFile();
@@ -98,6 +86,14 @@ nextSceneID = E_SCENE_RESULT;
 
  prevNextKey = nowNextKey = 0;
 
+ if (clear == true) 
+ {
+	 PlayMusic("sound/StageClear.mp3", DX_PLAYTYPE_BACK);
+ }
+ else if(clear == false) 
+ {
+	 PlayMusic("sound/StageFailed.mp3", DX_PLAYTYPE_BACK);
+ }
 
 }
 
@@ -107,21 +103,21 @@ nextSceneID = E_SCENE_RESULT;
 
 void Result::Update() {
 
- prevNextKey = nowNextKey;
+	prevNextKey = nowNextKey;
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
- nowNextKey = CheckHitKey(KEY_INPUT_SPACE);
-
-
-
-//アップトリガーで判断
- if (prevNextKey == 1  && nowNextKey == 0) {
-nextSceneID = E_SCENE_TITLE;
+	if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+		nowNextKey = 1;
 
 
+
+	//アップトリガーで判断
+	if (prevNextKey == 1 && nowNextKey == 0) {
+		StopMusic();
+		nextSceneID = E_SCENE_TITLE;
 	}
-
-
-
 }
 
 
@@ -188,33 +184,8 @@ void Result::Draw() {
 
 	
 
-	DrawRotaGraph3(SceneManager::SCREEN_SIZE_WID / 2, SceneManager::SCREEN_SIZE_HIG / 2,1024 / 2, 426 / 2, 1.875, 2.5, 0, result, false);
-
-
 	SetFontSize(48);
 
-
-
-	DrawFormatString(240, 80, GetColor(255, 255, 0), "1st:%d", firstscore);
-
-	DrawFormatString(240, 160, GetColor(200, 200, 200), "2nd:%d", secondscore);
-
-	DrawFormatString(240, 240, GetColor(204, 102, 0), "3rd:%d", thirdscore);
-
-	DrawFormatString(240, 320, GetColor(0, 180, 0), "4th:%d", fourcescore);
-
-	DrawFormatString(240, 400, GetColor(255, 255, 255), "You:%d", myscore);
-
-
-	DrawFormatString(1590, 990, GetColor(255, 255, 255), "SPACE>Title"); 
-
-
-
-	DrawFormatString(240, 500, GetColor(255, 0, 0), "BORDER:%d", p);
-
-	if (clear)DrawFormatString(480, 160, GetColor(255, 0, 0), "LEVEL CLEAR!!");
-
-	if (clear == false)DrawFormatString(480, 160, GetColor(0, 0, 0), "LEVEL FAILED...");
 
 		DrawFormatString(240, 80, GetColor(255, 255, 0), "1st:%d", firstscore);
 		DrawFormatString(240, 160, GetColor(200, 200, 200), "2nd:%d", secondscore);
@@ -236,6 +207,18 @@ void Result::Draw() {
 bool Result::Release() {
 
 	if (DeleteGraph(result) == -1)return false;
+
+	if (clearSe != -1) 
+	{
+		DeleteSoundMem(clearSe);
+		clearSe = -1;
+	}
+
+	if (failedSe != -1)
+	{
+		DeleteSoundMem(failedSe);
+		failedSe = -1;
+	}
 
 		 return true;
 
