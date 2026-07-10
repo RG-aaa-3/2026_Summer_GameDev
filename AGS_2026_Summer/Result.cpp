@@ -7,7 +7,7 @@
 #include "ModeSelect.h"
 #include "SceneManager.h"
 #include <functional>
-
+#include "InputManager.h"
 
 
 Result::Result(void) {
@@ -103,33 +103,21 @@ nextSceneID = E_SCENE_RESULT;
 
 void Result::Update() {
 
- prevNextKey = nowNextKey;
+	prevNextKey = nowNextKey;
+	InputManager& inputIns = InputManager::GetInstance();
+	InputManager::JOYPAD_IN_STATE state =
+		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
- nowNextKey = CheckHitKey(KEY_INPUT_SPACE);
-
-
-
-//アップトリガーで判断
- if (prevNextKey == 1  && nowNextKey == 0) {
-
-	 if (CheckHitKey(KEY_INPUT_SPACE)) 
-	 {
-		 StopMusic();
-		 nextSceneID = E_SCENE_TITLE;
-	 }
+	if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+		nowNextKey = 1;
 
 
-	 if (GetJoypadInputState(DX_INPUT_KEY_PAD1) & KEY_INPUT_B)
-	 {
-		 StopMusic();
-		 nextSceneID = E_SCENE_TITLE;
-	 }
 
-
+	//アップトリガーで判断
+	if (prevNextKey == 1 && nowNextKey == 0) {
+		StopMusic();
+		nextSceneID = E_SCENE_TITLE;
 	}
-
-
-
 }
 
 
