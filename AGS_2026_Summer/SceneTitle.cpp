@@ -18,7 +18,7 @@ TitleScene::~TitleScene(void)
 bool TitleScene::SystemInit(void)
 {
 
-	imgTi = LoadGraph("Screen/Title(Tentative).png");
+	imgTi = LoadGraph("Screen/Title.png");
 
 	yesimg = LoadGraph("Screen/Yes.png");
 	noimg = LoadGraph("Screen/No.png");
