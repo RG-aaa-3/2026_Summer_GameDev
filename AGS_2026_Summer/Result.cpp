@@ -51,32 +51,25 @@ Result::~Result(void) {
 }
 
 
+bool Result::SystemInit()
+{
+	result = LoadGraph("Screen/Result.png");
 
-bool Result::SystemInit() {
+	if (result == -1)
+	{
+		return false;
+	}
 
+	clearSe = LoadSoundMem("sound/StageClear.mp3");
+	failedSe = LoadSoundMem("sound/StageFailed.mp3");
 
+	if (clearSe == -1 || failedSe == -1)
+	{
+		return false;
+	}
 
-result = LoadGraph("Screen/Result.png"); 
-
-if (result == -1)return false;
-
-clearSe = LoadSoundMem("sound/StageClear.mp3");
-failedSe = LoadSoundMem("sound/StageFailed.mp3");
-
-
-LoadHighScoreFile();
-LoadArenaFloorFile();
-
-
- return true;
-
+	return true;
 }
-
-
-
-
-
-
 
 
 
@@ -100,27 +93,26 @@ nextSceneID = E_SCENE_RESULT;
 
 
 
-
-void Result::Update() {
-
-	prevNextKey = nowNextKey;
+void Result::Update()
+{
 	InputManager& inputIns = InputManager::GetInstance();
-	InputManager::JOYPAD_IN_STATE state =
-		inputIns.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
 
-	if (CheckHitKey(KEY_INPUT_SPACE) || inputIns.IsPadBtnNew(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
-		nowNextKey = 1;
+	bool submit =
+		CheckHitKey(KEY_INPUT_SPACE) ||
+		inputIns.IsPadBtnNew(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::RIGHT
+		);
 
-
-
-	//ƒAƒbƒvƒgƒŠƒK[‚Å”»’f
-	if (prevNextKey == 1 && nowNextKey == 0) {
+	// ‰Ÿ‚µ‚½uŠÔ‚É”½‰ž
+	if (submit && prevNextKey == 0)
+	{
 		StopMusic();
 		nextSceneID = E_SCENE_TITLE;
 	}
+
+	prevNextKey = submit ? 1 : 0;
 }
-
-
 
 
 
@@ -271,187 +263,65 @@ void Result::SetResultData(
 	borderPoint = border;
 	resultDiffId = diff;
 	resultModeId = mode;
-	
 	arenaFloor = floor;
 
 	if (resultModeId == E_MODE_ARENA)
 	{
+		LoadArenaFloorFile();
 		ArenaFloorRankUpdate();
+		clear = false;
 	}
 	else
 	{
+		LoadHighScoreFile();
 		HighScoreUpdate();
 		IsBorderCleard();
 	}
 }
 
-
 bool Result::LoadHighScoreFile(void)
-
 {
-	switch (resultDiffId) {
-	case E_DIFF_EASY:
+	std::ifstream file(GetHighScoreFilePath());
+
+	if (!file.is_open())
 	{
-		std::ifstream file("data/Easyscore.txt");
-
-
-		if (!file.is_open())
-		{
-
-			firstscore = 0;
-
-			secondscore = 0;
-
-			thirdscore = 0;
-			fourcescore = 0;
-
-			return false;
-
-		}
-
-
-		file >> firstscore;
-		file >> secondscore;
-		file >> thirdscore;
-		file >> fourcescore;
-		file.close();
-
-		return true;
-		break;
-	}
-	case E_DIFF_HARD:
-
-	{
-		std::ifstream file("data/Hardscore.txt");
-
-
-		if (!file.is_open())
-		{
-
-			firstscore = 0;
-
-			secondscore = 0;
-
-			thirdscore = 0;
-			fourcescore = 0;
-
-			return false;
-
-		}
-
-
-		file >> firstscore;
-		file >> secondscore;
-		file >> thirdscore;
-		file >> fourcescore;
-		file.close();
-
-		return true;
-		break;
+		firstscore = 0;
+		secondscore = 0;
+		thirdscore = 0;
+		fourcescore = 0;
+		return false;
 	}
 
-	case E_DIFF_MASTER:
+	file >> firstscore;
+	file >> secondscore;
+	file >> thirdscore;
+	file >> fourcescore;
 
-	{
-		std::ifstream file("data/Masterscore.txt");
+	file.close();
 
-
-		if (!file.is_open())
-		{
-
-			firstscore = 0;
-
-			secondscore = 0;
-
-			thirdscore = 0;
-			fourcescore = 0;
-
-			return false;
-
-		}
-
-
-		file >> firstscore;
-		file >> secondscore;
-		file >> thirdscore;
-		file >> fourcescore;
-		file.close();
-
-		return true;
-		break;
-	}
-	}
+	return true;
 }
 
 
 
 bool Result::SaveHighScoreFile(void)
-
 {
-	
+	std::ofstream file(GetHighScoreFilePath());
 
-	switch (resultDiffId) {
-	case E_DIFF_EASY:
+	if (!file.is_open())
 	{
-		std::ofstream file("data/Easyscore.txt");
-
-		if (!file.is_open())
-		{
-			return false;
-		}
-
-		file << firstscore << std::endl;
-		file << secondscore << std::endl;
-		file << thirdscore << std::endl;
-		file << fourcescore << std::endl;
-
-		file.close();
-
-		return true;
-		break;
+		return false;
 	}
-	case E_DIFF_HARD:
-	{
-		std::ofstream file("data/Hardscore.txt");
 
-		if (!file.is_open())
-		{
-			return false;
-		}
+	file << firstscore << std::endl;
+	file << secondscore << std::endl;
+	file << thirdscore << std::endl;
+	file << fourcescore << std::endl;
 
-		file << firstscore << std::endl;
-		file << secondscore << std::endl;
-		file << thirdscore << std::endl;
-		file << fourcescore << std::endl;
+	file.close();
 
-		file.close();
-
-		return true;
-		break;
-	}
-	case E_DIFF_MASTER:
-
-	{
-		std::ofstream file("data/Masterscore.txt");
-
-		if (!file.is_open())
-		{
-			return false;
-		}
-
-		file << firstscore << std::endl;
-		file << secondscore << std::endl;
-		file << thirdscore << std::endl;
-		file << fourcescore << std::endl;
-
-		file.close();
-
-		return true;
-		break;
-	}
-	}
+	return true;
 }
-
 
 
 void Result::IsBorderCleard(void) {
@@ -531,4 +401,22 @@ void Result::ArenaFloorRankUpdate(void)
 	fourthFloor = floors[3];
 
 	SaveArenaFloorFile();
+}
+
+std::string Result::GetHighScoreFilePath(void) const
+{
+	switch (resultDiffId)
+	{
+	case E_DIFF_EASY:
+		return "data/Easyscore.txt";
+
+	case E_DIFF_HARD:
+		return "data/Hardscore.txt";
+
+	case E_DIFF_MASTER:
+		return "data/Masterscore.txt";
+
+	default:
+		return "data/Easyscore.txt";
+	}
 }

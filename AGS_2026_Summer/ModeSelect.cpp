@@ -56,7 +56,7 @@ bool ModeSelect::SystemInit(void) {
 
 void ModeSelect::GameInit(void) {
 
-	PlayMusic("sound/ñÇâ§ç∞ ModeSelect.mp3", DX_PLAYTYPE_LOOP);
+	PlaySoundMem(msSe, DX_PLAYTYPE_LOOP);
 
 	modeId = E_MODE_BASIC;
 	diffId = E_DIFF_EASY;
@@ -292,7 +292,7 @@ void ModeSelect::BoarderTextUpdate(void) {
 
 void ModeSelect::SubmitGame(void)
 {
-	StopMusic();
+	StopSoundMem(msSe);
 
 	switch (modeId) {
 	case E_MODE_ARENA:

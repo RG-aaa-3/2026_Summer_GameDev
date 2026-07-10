@@ -38,7 +38,7 @@ bool SceneManager::SystemInit(void) {
 	// システム処理
 	SetWindowText("Pazzle Arena");						// ゲームウィンドウのタイトル
 	SetGraphMode(SCREEN_SIZE_WID, SCREEN_SIZE_HIG, 32);		// ゲームウィンドウのサイズと色モードを設定
-	ChangeWindowMode(true);									// ゲームウィンドウの表示方法(false = フルスクリーン)
+	ChangeWindowMode(false);									// ゲームウィンドウの表示方法(false = フルスクリーン)
 
 	if (DxLib_Init() == -1) {
 		return false;	//初期化失敗のためエラー終了

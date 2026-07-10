@@ -30,11 +30,13 @@ GameScene::GameScene(void) {
 	noimg = -1;
 
 
-	readySe = -1;
-	 goSe = -1;
+
+
 
 	 readySePlayed = false;
 	 goSePlayed = false;
+
+	 gameBGM = - 1;
 
 	modeId = E_MODE_BASIC;
 }
@@ -72,11 +74,11 @@ bool GameScene::SystemInit(void)
 	if (yesimg == -1 || noimg == -1)return false;
 
 
-	readySe = LoadSoundMem("sound/ready.mp3");
-	goSe = LoadSoundMem("sound/go.mp3");
 
-	if (readySe == -1 || goSe == -1)return false;
 
+	gameBGM = LoadSoundMem("sound/Extinguish.mp3");
+
+	if (gameBGM==-1)return false;
 
 	Hp = Maxhp;
 
@@ -122,6 +124,8 @@ void GameScene::GameInit(void) {
 
 	prevSpaceKey = nowSpaceKey = 0;
 	nextSceneID = E_SCENE_GAME;
+
+	PlaySoundMem(gameBGM, DX_PLAYTYPE_BACK);
 }
 
 
@@ -219,17 +223,9 @@ bool GameScene::Release(void) {
 		delete Cursor;
 		Cursor = nullptr;
 	}
-	if (readySe != -1)
-	{
-		DeleteSoundMem(readySe);
-		readySe = -1;
-	}
-
-	if (goSe != -1)
-	{
-		DeleteSoundMem(goSe);
-		goSe = -1;
-	}
+	if (gameBGM != -1) {
+		DeleteSoundMem(gameBGM);
+}
 
 	return true;
 }
@@ -900,7 +896,6 @@ bool GameScene::IsTimeUp(void) const
 	{
 		return false;
 	}
-
 	return GetRemainingTime() <= 0.0f;
 }
 
@@ -996,12 +991,7 @@ void GameScene::UpdateStartSequence(void)
 
 	if (gamePhase == GAME_PHASE::READY)
 	{
-		if (!readySePlayed) {
-			PlaySoundMem(readySe, DX_PLAYTYPE_BACK);
-			readySePlayed = true;
-		}
-
-
+	
 		if (startCountFrame >= readyDisplayFrame)
 		{
 			gamePhase = GAME_PHASE::GO;
@@ -1010,13 +1000,6 @@ void GameScene::UpdateStartSequence(void)
 	}
 	else if (gamePhase == GAME_PHASE::GO)
 	{
-
-		if (!goSePlayed) {
-			PlaySoundMem(goSe, DX_PLAYTYPE_BACK);
-			goSePlayed = true;
-
-
-		}
 
 
 		if (startCountFrame >= goDisplayFrame)
@@ -1220,8 +1203,13 @@ void GameScene::BaseUpdate() {
 		return;
 	}
 
-	if (IsTimeUp()&&modeId==E_MODE_BASIC)
+	if (IsTimeUp() && modeId == E_MODE_BASIC)
 	{
+		if (timeupWaitFrame == 0)
+		{
+			StopSoundMem(gameBGM);
+		}
+
 		timeupWaitFrame++;
 
 		if (timeupWaitFrame >= TIME_UP_WAIT_FRAME)
@@ -1231,7 +1219,6 @@ void GameScene::BaseUpdate() {
 
 		return;
 	}
-
 	if (isClear)
 	{
 		clearWaitFrame++;

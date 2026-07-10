@@ -1,6 +1,6 @@
 #pragma once
 #include "StDefine.h"
-
+#include <string>
 
 class GameScene;
 
@@ -51,15 +51,9 @@ public:
 
 	 E_SCENE_ID GetNextSceneID(void) { return nextSceneID; }
 
-
-
 	void SetBorderPoint(int border) { borderPoint = border; }
 
-
-
-
-
-
+	std::string GetHighScoreFilePath(void) const;
 
 	void SetResultData(
 		int score,

@@ -243,15 +243,12 @@ private:
 	int imgtrg = 1;
 
 	//SE—pƒnƒ“ƒhƒ‹
-	int readySe;
-	int goSe;
-
-
 	bool readySePlayed;
 	bool goSePlayed;
 
 	bool Quitkakunin = false;
 	int prevSpaceKey, nowSpaceKey;
 
+	int gameBGM;
 };
 
